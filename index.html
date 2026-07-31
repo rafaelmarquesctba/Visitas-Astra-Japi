@@ -29,7 +29,7 @@
   --shadow: 0 2px 12px rgba(0,124,194,0.10);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 80px; overflow-x: hidden; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 80px; }
 
 /* ===== HEADER ===== */
 .header {
@@ -45,9 +45,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .btn-icon {
   background: rgba(255,255,255,0.15); border: none; color: #fff; width: 36px; height: 36px;
   border-radius: 50%; font-size: 17px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
 }
+.btn-icon:hover, .btn-icon:active { background: rgba(255,255,255,0.25); }
 
-/* ===== SEARCH & FILTERS ===== */
+/* ===== SEARCH BAR ===== */
 .search-bar {
   display: flex; gap: 8px; padding: 10px 16px; background: var(--surface);
   border-bottom: 1px solid var(--border); position: sticky; top: 64px; z-index: 99;
@@ -55,101 +57,179 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .search-bar input {
   flex: 1; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
   padding: 9px 12px; font-size: 14px; outline: none; background: var(--bg);
+  transition: border .2s;
 }
+.search-bar input:focus { border-color: var(--accent); background: #fff; }
 .search-bar select {
   border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  padding: 9px 4px; font-size: 12px; background: var(--bg); outline: none; max-width: 100px;
+  padding: 9px 4px; font-size: 12px; background: var(--bg); outline: none; color: var(--text);
 }
 
-/* ===== CHIPS ===== */
-.urg-chips { display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto; scrollbar-width: none; }
+/* ===== URGÊNCIA CHIPS ===== */
+.urg-chips {
+  display: flex; gap: 6px; padding: 8px 16px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
 .urg-chips::-webkit-scrollbar { display: none; }
 .chip {
-  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
-  white-space: nowrap; border: none; cursor: pointer; background: var(--gray-light); color: var(--muted);
+  padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  white-space: nowrap; border: none; cursor: pointer; transition: all .2s;
+  background: var(--gray-light); color: var(--muted);
 }
 .chip.active { background: var(--accent); color: #fff; }
+.chip-red { background: var(--red-light); color: var(--red); }
 .chip-red.active { background: var(--red); color: #fff; }
+.chip-amber { background: var(--amber-light); color: var(--amber); }
 .chip-amber.active { background: var(--amber); color: #fff; }
+.chip-green { background: var(--green-light); color: var(--green); }
 .chip-green.active { background: var(--green); color: #fff; }
 
 /* ===== LISTA ===== */
 .list-wrap { padding: 0 16px; }
 .card {
-  background: var(--surface); border-radius: var(--radius); padding: 16px;
-  margin-bottom: 12px; box-shadow: var(--shadow); border: 1px solid var(--border);
-  cursor: pointer; transition: transform 0.2s;
+  background: var(--surface); border-radius: var(--radius);
+  padding: 14px 16px; margin-bottom: 10px;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+  cursor: pointer; transition: all .2s;
 }
 .card:active { transform: scale(0.98); }
-.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-.card-name { font-size: 15px; font-weight: 700; color: var(--text); }
-.badge { font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; }
-.badge-astra { background: var(--red); color: #fff; }
-.badge-japi { background: var(--accent); color: #fff; }
-.card-info { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
-.card-contact { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 12px; font-style: italic; }
-
-/* ===== DASHBOARD ===== */
-.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; }
-.dash-card {
-  background: var(--surface); border-radius: var(--radius); padding: 16px;
-  box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center;
+.card-row1 { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.card-name { font-size: 15px; font-weight: 700; }
+.badge {
+  font-size: 10.5px; font-weight: 700; padding: 2px 10px;
+  border-radius: 20px; text-transform: uppercase; letter-spacing: .3px;
 }
-.dash-num { font-size: 24px; font-weight: 800; color: var(--accent); }
-.dash-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
-.dash-section { padding: 0 16px 20px; }
-.dash-section-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-.dash-list-item {
-  background: #fff; padding: 12px; border-radius: var(--radius-sm);
-  border: 1px solid var(--border); margin-bottom: 8px; display: flex; justify-content: space-between; font-size: 13px;
+.badge-red { background: #C62828; color: #fff; }
+.badge-blue { background: #007CC2; color: #fff; }
+.card-row2 { display: flex; gap: 12px; font-size: 12px; color: var(--muted); flex-wrap: wrap; align-items: center; }
+.card-obs { font-size: 12px; color: var(--muted); margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+.empty-state div { font-size: 40px; margin-bottom: 10px; }
+
+/* ===== BOTÕES ===== */
+.btn-primary {
+  background: linear-gradient(135deg, #007CC2, #005A8C);
+  color: #fff; border: none; padding: 12px 24px; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: all .2s; width: 100%;
+}
+.btn-primary:active { transform: scale(0.97); opacity: 0.9; }
+.btn-secondary {
+  background: var(--gray-light); color: var(--text); border: none;
+  padding: 10px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.btn-sm {
+  padding: 6px 14px; font-size: 12px; border-radius: var(--radius-sm);
+  border: none; font-weight: 600; cursor: pointer;
 }
 
-/* ===== DRAWERS & MODALS ===== */
+/* ===== DRAWER / MODAL ===== */
 .drawer-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200;
-  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 200; opacity: 0; pointer-events: none; transition: opacity .3s;
 }
 .drawer-overlay.open { opacity: 1; pointer-events: auto; }
 .drawer {
-  position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface);
-  border-radius: 20px 20px 0 0; z-index: 210; padding: 20px;
-  transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-  max-height: 90vh; overflow-y: auto;
+  position: fixed; bottom: 0; left: 0; right: 0; max-height: 88vh;
+  background: var(--surface); border-radius: 20px 20px 0 0;
+  z-index: 210; transform: translateY(100%); transition: transform .35s cubic-bezier(.32,.72,0,1);
+  overflow-y: auto; padding: 20px 20px 30px;
 }
 .drawer.open { transform: translateY(0); }
-.drawer-handle { width: 40px; height: 5px; background: #ddd; border-radius: 10px; margin: 0 auto 20px; }
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
-.form-group input, .form-group select {
-  width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; outline: none;
+.drawer-handle {
+  width: 36px; height: 4px; background: #ddd; border-radius: 2px;
+  margin: 0 auto 16px;
 }
-.radio-group { display: flex; gap: 20px; padding: 5px 0; }
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  color: #fff; border: none; width: 100%; padding: 14px; border-radius: var(--radius-sm);
-  font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px;
+.drawer-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+.form-group input, .form-group select {
+  width: 100%; padding: 10px 12px; border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 14px; outline: none;
+  transition: border .2s;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+.radio-group { display: flex; gap: 12px; }
+.radio-group label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 14px; cursor: pointer;
 }
 
-/* ===== TAB BAR ===== */
-.tab-bar {
-  position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface);
-  display: flex; border-top: 1px solid var(--border); z-index: 100;
-  padding-bottom: env(safe-area-inset-bottom);
+/* ===== CONFIG MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 200; opacity: 0; pointer-events: none; transition: opacity .3s;
 }
-.tab-item {
-  flex: 1; padding: 12px 0; text-align: center; font-size: 11px; font-weight: 600;
-  color: var(--muted); cursor: pointer; display: flex; flex-direction: column; gap: 4px;
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.92);
+  background: var(--surface); border-radius: var(--radius);
+  z-index: 210; width: 92%; max-width: 500px; max-height: 85vh;
+  overflow-y: auto; padding: 24px; opacity: 0; pointer-events: none;
+  transition: all .3s;
 }
-.tab-item.active { color: var(--accent); }
-.tab-icon { font-size: 20px; }
+.modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
+.modal-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+.modal-close {
+  float: right; background: none; border: none; font-size: 22px;
+  color: var(--muted); cursor: pointer; line-height: 1;
+}
+.cfg-body p { font-size: 13.5px; line-height: 1.6; color: var(--text); margin-bottom: 10px; }
+.cfg-body code { background: var(--gray-light); padding: 2px 6px; border-radius: 4px; font-size: 12.5px; }
+.cfg-body a { color: var(--accent); }
+.cfg-body ol { padding-left: 18px; font-size: 13.5px; line-height: 1.7; }
+
+/* ===== DASHBOARD ===== */
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px 12px; }
+.dash-card { background: var(--surface); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); cursor: pointer; transition: all .2s; }
+.dash-card:active { transform: scale(0.97); }
+.dash-card-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 12px; }
+.dash-num { font-size: 28px; font-weight: 800; line-height: 1.1; }
+.dash-label { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.expand-list { margin-top: 4px; }
+.expand-list-empty { font-size: 12.5px; color: var(--muted); padding: 4px 2px; }
+.bar-label { font-size: 12px; color: var(--muted); width: 46px; flex-shrink: 0; }
+.bar-track { flex: 1; background: var(--bg); border-radius: 5px; height: 14px; overflow: hidden; }
+.bar-fill { background: var(--accent); height: 100%; border-radius: 5px; }
+.bar-val { font-size: 12px; font-weight: 700; width: 22px; text-align: right; flex-shrink: 0; }
+.attn-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; cursor: pointer; }
+.attn-row:last-child { border-bottom: none; }
+.attn-name { flex: 1; padding-right: 8px; }
+.attn-days { font-weight: 700; font-size: 12px; flex-shrink: 0; }
 
 /* ===== TOAST ===== */
 .toast {
-  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-  background: #16202E; color: #fff; padding: 10px 20px; border-radius: 30px;
-  font-size: 13px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #16202E; color: #fff; padding: 11px 20px; border-radius: 30px;
+  font-size: 13.5px; z-index: 300; opacity: 0; transition: all .25s;
+  pointer-events: none; text-align: center; max-width: 88%;
 }
-.toast.show { opacity: 1; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== TAB BAR ===== */
+.tab-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; z-index: 100; padding: 6px 0 env(safe-area-inset-bottom);
+}
+.tab-item {
+  flex: 1; text-align: center; padding: 6px 0; cursor: pointer;
+  font-size: 11px; color: var(--muted); font-weight: 600;
+  transition: color .2s; border: none; background: none;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.tab-item .tab-icon { font-size: 20px; line-height: 1; }
+.tab-item.active { color: var(--accent); }
+
+/* ===== VISITAS NO DRAWER ===== */
+.visit-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.visit-item button {
+  background: var(--red-light); color: var(--red); border: none;
+  padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -168,67 +248,79 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="header-sub">Astra & Japi</div>
     </div>
   </div>
-  <button class="btn-icon" onclick="toggleConfig()">⚙️</button>
-</div>
-
-<div id="view-lista">
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="🔍 Buscar cliente..." oninput="renderLista()">
-    <select id="filterOrigem" onchange="renderLista()">
-      <option value="all">Origem</option>
-      <option value="Astra">Astra</option>
-      <option value="Japi">Japi</option>
-    </select>
-    <select id="sortOrder" onchange="renderLista()">
-      <option value="urgencia">Urgência</option>
-      <option value="nome">Nome A-Z</option>
-      <option value="compra">Compra</option>
-    </select>
-  </div>
-
-  <div class="urg-chips" id="urgChips"></div>
-  <div class="list-wrap" id="clientList"></div>
-</div>
-
-<div id="view-dashboard" style="display:none">
-  <div class="dash-grid" id="dashKpis"></div>
-  <div id="dashDetails" style="padding: 0 16px 16px"></div>
-  
-  <div class="dash-section">
-    <div class="dash-section-title">🔴 Sem visita +60 dias</div>
-    <div id="listCriticos"></div>
-  </div>
-  
-  <div class="dash-section">
-    <div class="dash-section-title">⚠️ Compra recente s/ visita</div>
-    <div id="listAtencao"></div>
+  <div class="header-actions">
+    <button class="btn-icon" onclick="toggleConfig()" title="Configurar sincronização">⚙️</button>
   </div>
 </div>
 
-<!-- DRAWERS -->
-<div class="drawer-overlay" id="drawerOverlay" onclick="closeAllDrawers()"></div>
+<div class="search-bar">
+  <input id="searchInput" placeholder="🔍 Buscar cliente..." oninput="renderLista()">
+  <select id="filterSelect" onchange="renderLista()">
+    <option value="all">Todas as origens</option>
+    <option value="Astra">Astra</option>
+    <option value="Japi">Japi</option>
+  </select>
+  <select id="sortSelect" onchange="renderLista()">
+    <option value="urg">Mais tempo sem visita</option>
+    <option value="nome">Nome (A-Z)</option>
+    <option value="compra">Última compra</option>
+  </select>
+</div>
 
-<div class="drawer" id="drawerNovo">
+<div class="urg-chips" id="urgChips"></div>
+
+<div class="list-wrap" id="clientList"></div>
+
+<div id="dashboardView" style="display:none">
+  <div class="dash-grid" id="dashGrid"></div>
+  <div id="dashDetail" style="padding:0 16px 16px"></div>
+  <div style="padding:0 16px 16px">
+    <div class="dash-card">
+      <div class="dash-card-title">🔴 Clientes com mais de 60 dias sem visita</div>
+      <div id="semVisitaLista"></div>
+    </div>
+    <div style="height:10px"></div>
+    <div class="dash-card">
+      <div class="dash-card-title">⚠️ Comprou recente, mas sem visita há tempo</div>
+      <div id="compraVsVisitaLista"></div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-item active" id="tabLista" onclick="showView('lista')">
+    <span class="tab-icon">📋</span> Lista
+  </button>
+  <button class="tab-item" id="tabDash" onclick="showView('dashboard')">
+    <span class="tab-icon">📊</span> Dashboard
+  </button>
+  <button class="tab-item" onclick="openNovoDrawer()">
+    <span class="tab-icon">➕</span> Novo
+  </button>
+</div>
+
+<div class="drawer-overlay" id="novoOverlay" onclick="closeNovoDrawer()"></div>
+<div class="drawer" id="novoDrawer">
   <div class="drawer-handle"></div>
-  <h3 style="margin-bottom:20px">Novo Cliente</h3>
+  <div class="drawer-title">Novo cliente</div>
   <div class="form-group">
-    <label>NOME DO CLIENTE *</label>
-    <input type="text" id="novoNome">
+    <label>Cliente *</label>
+    <input id="novoNome" placeholder="Nome do cliente">
   </div>
   <div class="form-group">
     <label>CNPJ</label>
-    <input type="text" id="novoCnpj">
+    <input id="novoCnpj" placeholder="00.000.000/0000-00">
   </div>
   <div class="form-group">
-    <label>CONTATO</label>
-    <input type="text" id="novoContato">
+    <label>Contato / referência</label>
+    <input id="novoContato" placeholder="Telefone, e-mail ou contato">
   </div>
   <div class="form-group">
-    <label>ÚLTIMA COMPRA</label>
-    <input type="date" id="novoCompra">
+    <label>Última compra</label>
+    <input id="novoCompra" type="date">
   </div>
   <div class="form-group">
-    <label>ORIGEM</label>
+    <label>Origem</label>
     <div class="radio-group">
       <label><input type="radio" name="novoOrigem" value="Astra" checked> Astra</label>
       <label><input type="radio" name="novoOrigem" value="Japi"> Japi</label>
@@ -237,351 +329,473 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <button class="btn-primary" onclick="salvarNovo()">Salvar cliente</button>
 </div>
 
-<div class="drawer" id="drawerEdit">
+<div class="drawer-overlay" id="editOverlay" onclick="closeEditDrawer()"></div>
+<div class="drawer" id="editDrawer">
   <div class="drawer-handle"></div>
-  <h3 style="margin-bottom:20px">Editar Cliente</h3>
-  <input type="hidden" id="editId">
+  <div class="drawer-title">Editar cliente</div>
   <div class="form-group">
-    <label>NOME DO CLIENTE</label>
-    <input type="text" id="editNome">
+    <label>Cliente *</label>
+    <input id="editNome" placeholder="Nome">
   </div>
   <div class="form-group">
-    <label>ÚLTIMA COMPRA</label>
-    <input type="date" id="editCompra">
+    <label>CNPJ</label>
+    <input id="editCnpj" placeholder="00.000.000/0000-00">
   </div>
   <div class="form-group">
-    <label>VISITAS REALIZADAS</label>
-    <div id="editVisitasLista" style="margin-bottom:10px"></div>
-    <div style="display:flex; gap:8px">
-      <input type="date" id="novaVisitaData" style="flex:1">
-      <button class="btn-primary" style="width:50px; margin:0" onclick="addVisita()">+</button>
+    <label>Contato / referência</label>
+    <input id="editContato" placeholder="Telefone, e-mail">
+  </div>
+  <div class="form-group">
+    <label>Última compra</label>
+    <input id="editCompra" type="date">
+  </div>
+  <div class="form-group">
+    <label>Origem</label>
+    <div class="radio-group">
+      <label><input type="radio" name="editOrigem" value="Astra"> Astra</label>
+      <label><input type="radio" name="editOrigem" value="Japi"> Japi</label>
     </div>
   </div>
-  <button class="btn-primary" onclick="salvarEdicao()">Salvar Alterações</button>
-  <button class="btn-primary" style="background:none; color:var(--red); border:1px solid var(--red); margin-top:10px" onclick="excluirCliente()">Excluir Cliente</button>
+  <div class="form-group">
+    <label>Visitas realizadas</label>
+    <div id="editVisitasList"></div>
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <input id="editNovaVisita" type="date" style="flex:1;padding:8px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px">
+      <button class="btn-sm" style="background:var(--accent);color:#fff" onclick="addVisita()">+</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:16px">
+    <button class="btn-primary" style="flex:1" onclick="salvarEdicao()">Salvar</button>
+    <button class="btn-secondary" onclick="excluirCliente()" style="color:var(--red)">Excluir</button>
+  </div>
 </div>
 
-<div class="drawer" id="modalConfig">
-  <div class="drawer-handle"></div>
-  <h3>Sincronização</h3>
-  <p style="font-size:13px; color:var(--muted); margin:15px 0">Conecte com seu Google Sheets para manter os dados salvos na nuvem.</p>
-  <button class="btn-primary" onclick="sincronizarAgora()">⇅ Sincronizar agora</button>
-  <button class="btn-primary" style="background:var(--gray-light); color:var(--text); margin-top:10px" onclick="exportarXLSX()">📥 Exportar Excel</button>
-</div>
-
-<div class="tab-bar">
-  <div class="tab-item active" id="tab-lista" onclick="showView('lista')">
-    <span class="tab-icon">📋</span><span>Lista</span>
-  </div>
-  <div class="tab-item" id="tab-dash" onclick="showView('dashboard')">
-    <span class="tab-icon">📊</span><span>Dashboard</span>
-  </div>
-  <div class="tab-item" onclick="openNovoDrawer()">
-    <span class="tab-icon">➕</span><span>Novo</span>
+<div class="modal-overlay" id="configOverlay" onclick="toggleConfig()"></div>
+<div class="modal" id="configModal">
+  <button class="modal-close" onclick="toggleConfig()">✕</button>
+  <div class="modal-title">⚙️ Sincronização com Google Sheets</div>
+  <div class="cfg-body">
+    <p>Por padrão, os dados ficam salvos <strong>somente neste navegador</strong>. Para sincronizar entre aparelhos, usamos uma planilha do Google como "banco de dados" central, via Google Apps Script. Configuração única, sem necessidade de login em cada acesso:</p>
+    <ol>
+      <li>Crie uma planilha nova em <a href="https://sheets.new" target="_blank">sheets.new</a> (ex: "Visitas Astra Japi - Dados").</li>
+      <li>No menu, vá em <strong>Extensões → Apps Script</strong>.</li>
+      <li>Apague o conteúdo padrão e cole o código do arquivo <code>google-apps-script.gs</code> (fornecido junto com este app).</li>
+      <li>Clique em <strong>Implantar → Nova implantação</strong>. Tipo: <strong>App da Web</strong>.</li>
+      <li>Em "Quem pode acessar", escolha <strong>Qualquer pessoa</strong> e clique em Implantar (autorize as permissões pedidas).</li>
+      <li>Copie a <strong>URL do app da Web</strong> gerada e cole na constante <code>APPS_SCRIPT_URL</code> no início do arquivo <code>index.html</code>.</li>
+    </ol>
+    <p>Depois disso, o botão "⇅ Sincronizar" salva e busca os dados diretamente nessa planilha — de qualquer aparelho, sem login.</p>
+    <p>⚠️ Trate a URL do Web App como uma senha: quem tiver o link consegue ler e alterar os dados. Não a compartilhe publicamente.</p>
+    <p>Enquanto isso não for configurado, o app continua funcionando normalmente, apenas offline/local.</p>
+    <button class="btn-primary" onclick="sincronizarAgora()" style="margin-top:10px">⇅ Sincronizar agora</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+/* ======================= CONFIG ======================= */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxRWczQWpigTbj9SdOTPAKzfb30OWScWUxarmBHmd4k5PaORkTyAnA2QUT_K-ojpRxP/exec';
-let clientes = [];
-let currentChip = 'all';
-let expandedKpi = null;
 
-// --- DATA MGMT ---
+/* ======================= DADOS ======================= */
+let clientes = [];
+let editandoId = null;
+let dashKpiOpen = null;
+
 function loadClientes() {
-  const saved = localStorage.getItem('astraJapiClientes');
-  clientes = saved ? JSON.parse(saved) : [];
+  try {
+    const raw = localStorage.getItem('visitas_clientes');
+    clientes = raw ? JSON.parse(raw) : [];
+  } catch(e) { clientes = []; }
 }
 
 function saveClientes() {
-  localStorage.setItem('astraJapiClientes', JSON.stringify(clientes));
+  localStorage.setItem('visitas_clientes', JSON.stringify(clientes));
 }
 
-// --- UTILS ---
-function todayISO() { return new Date().toISOString().split('T')[0]; }
-function diffDays(d) {
-  if(!d) return null;
-  const diff = new Date() - new Date(d);
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
+function todayISO() {
+  return new Date().toISOString().split('T')[0];
 }
-function fmtDate(d) { return d ? d.split('-').reverse().join('/') : '—'; }
+
+function diffDays(d) {
+  if (!d) return null;
+  const t = new Date(d + 'T00:00:00');
+  return Math.floor((Date.now() - t.getTime()) / 86400000);
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const p = d.split('-');
+  return `${p[2]}/${p[1]}/${p[0]}`;
+}
 
 function urgenciaInfo(c) {
-  const d = diffDays(c.ultimaVisita);
-  if (d === null) return { label: 'Nunca visitado', cls: 'chip-amber' };
-  if (d > 60) return { label: `${d}d sem visita`, cls: 'chip-red' };
-  if (d > 30) return { label: `${d}d sem visita`, cls: 'chip-amber' };
-  return { label: `${d}d atrás`, cls: 'chip-green' };
+  const dias = diffDays(c.ultimaVisita);
+  if (dias === null) return { label: 'Nunca visitado', color: 'var(--red)', cls: 'chip-red' };
+  if (dias > 60) return { label: `${dias}d sem visita`, color: 'var(--red)', cls: 'chip-red' };
+  if (dias > 30) return { label: `${dias}d sem visita`, color: 'var(--amber)', cls: 'chip-amber' };
+  return { label: `${dias}d atrás`, color: 'var(--green)', cls: 'chip-green' };
 }
 
-// --- RENDERERS ---
+/* ======================= RENDER ======================= */
 function renderUrgChips() {
+  const wrap = document.getElementById('urgChips');
   const total = clientes.length;
-  const criticos = clientes.filter(c => { const d = diffDays(c.ultimaVisita); return d === null || d > 60; }).length;
+  const sem60 = clientes.filter(c => { const d = diffDays(c.ultimaVisita); return d === null || d > 60; }).length;
   const nunca = clientes.filter(c => !c.ultimaVisita).length;
-  const ok = total - criticos;
-
-  const html = `
-    <button class="chip ${currentChip==='all'?'active':''}" onclick="setChip('all')">Todos (${total})</button>
-    <button class="chip chip-red ${currentChip==='critico'?'active':''}" onclick="setChip('critico')">🔴 ${criticos} críticos</button>
-    <button class="chip chip-amber ${currentChip==='nunca'?'active':''}" onclick="setChip('nunca')">🟡 ${nunca} nunca</button>
-    <button class="chip chip-green ${currentChip==='ok'?'active':''}" onclick="setChip('ok')">🟢 ${ok} ok</button>
+  const ok = total - sem60;
+  wrap.innerHTML = `
+    <button class="chip active" data-f="all" onclick="setChip(this,'all')">Todos (${total})</button>
+    <button class="chip chip-red" data-f="urg" onclick="setChip(this,'urg')">🔴 ${sem60} críticos</button>
+    <button class="chip chip-amber" data-f="nunca" onclick="setChip(this,'nunca')">🟡 ${nunca} nunca</button>
+    <button class="chip chip-green" data-f="ok" onclick="setChip(this,'ok')">🟢 ${ok} ok</button>
   `;
-  document.getElementById('urgChips').innerHTML = html;
 }
 
-function setChip(c) { currentChip = c; renderUrgChips(); renderLista(); }
+let chipFilter = 'all';
+function setChip(el, f) {
+  chipFilter = f;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderLista();
+}
 
 function renderLista() {
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const origem = document.getElementById('filterOrigem').value;
-  const sort = document.getElementById('sortOrder').value;
+  const q = document.getElementById('searchInput').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const origem = document.getElementById('filterSelect').value;
+  const sort = document.getElementById('sortSelect').value;
 
-  let filtered = clientes.filter(c => {
-    const matchSearch = c.nome.toLowerCase().includes(search);
+  let lista = clientes.filter(c => {
+    const matchNome = c.nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(q);
     const matchOrigem = origem === 'all' || c.origem === origem;
-    let matchChip = true;
-    const d = diffDays(c.ultimaVisita);
-    if(currentChip === 'critico') matchChip = (d === null || d > 60);
-    if(currentChip === 'nunca') matchChip = (d === null);
-    if(currentChip === 'ok') matchChip = (d !== null && d &lt;= 60);
-    return matchSearch && matchOrigem && matchChip;
+    if (!matchNome || !matchOrigem) return false;
+    if (chipFilter === 'all') return true;
+    if (chipFilter === 'urg') { const d = diffDays(c.ultimaVisita); return d === null || d > 60; }
+    if (chipFilter === 'nunca') return !c.ultimaVisita;
+    if (chipFilter === 'ok') { const d = diffDays(c.ultimaVisita); return d !== null && d <= 60; }
+    return true;
   });
 
-  filtered.sort((a, b) => {
-    if(sort === 'nome') return a.nome.localeCompare(b.nome);
-    if(sort === 'compra') return (b.ultimaCompra || '') > (a.ultimaCompra || '') ? 1 : -1;
-    const da = diffDays(a.ultimaVisita) ?? 999;
-    const db = diffDays(b.ultimaVisita) ?? 999;
+  if (sort === 'nome') lista.sort((a,b) => a.nome.localeCompare(b.nome));
+  else if (sort === 'compra') lista.sort((a,b) => (b.ultimaCompra||'').localeCompare(a.ultimaCompra||''));
+  else lista.sort((a,b) => {
+    const da = diffDays(a.ultimaVisita); const db = diffDays(b.ultimaVisita);
+    if (da === null && db === null) return 0;
+    if (da === null) return -1; if (db === null) return 1;
     return db - da;
   });
 
   const wrap = document.getElementById('clientList');
-  wrap.innerHTML = filtered.map(c => {
+  if (lista.length === 0) {
+    wrap.innerHTML = `<div class="empty-state"><div>🔍</div>Nenhum cliente encontrado</div>`;
+    return;
+  }
+  wrap.innerHTML = lista.map(c => {
     const info = urgenciaInfo(c);
+    const badgeClass = c.origem === 'Astra' ? 'badge-red' : 'badge-blue';
     return `
       <div class="card" onclick="openEditDrawer('${c.id}')">
-        <div class="card-header">
+        <div class="card-row1">
           <div class="card-name">${c.nome}</div>
-          <span class="badge badge-${c.origem.toLowerCase()}">${c.origem}</span>
+          <span class="badge ${badgeClass}">${c.origem}</span>
         </div>
-        <div class="card-info">
-          <span style="color:${info.cls==='chip-red'?'var(--red)':'var(--muted)'}; font-weight:600">${info.label}</span>
+        <div class="card-row2">
+          <span>${info.label}</span>
+          <span>·</span>
           <span>Última compra: ${fmtDate(c.ultimaCompra)}</span>
         </div>
-        ${c.contato ? `<div class="card-contact">📞 ${c.contato}</div>` : ''}
+        ${c.contato ? `<div class="card-obs">${c.contato}</div>` : ''}
       </div>
     `;
   }).join('');
 }
 
+/* ======================= VIEWS ======================= */
+function showView(v) {
+  document.getElementById('tabLista').classList.toggle('active', v==='lista');
+  document.getElementById('tabDash').classList.toggle('active', v==='dashboard');
+  document.getElementById('clientList').style.display = v==='lista' ? 'block' : 'none';
+  document.getElementById('dashboardView').style.display = v==='dashboard' ? 'block' : 'none';
+  document.querySelector('.urg-chips').style.display = v==='lista' ? 'flex' : 'none';
+  if (v==='dashboard') renderDashboard();
+}
+
+/* ======================= DASHBOARD ======================= */
 function renderDashboard() {
   const total = clientes.length;
-  const criticos = clientes.filter(c => { const d = diffDays(c.ultimaVisita); return d === null || d > 60; });
-  const nunca = clientes.filter(c => !c.ultimaVisita);
-  const v30 = clientes.filter(c => c.visitas?.some(v => diffDays(v) &lt;= 30));
+  const semVisita60 = clientes.filter(c => { const d = diffDays(c.ultimaVisita); return d === null || d > 60; }).length;
+  const nuncaVisitado = clientes.filter(c => !c.ultimaVisita).length;
+  const visitas30 = clientes.filter(c => c.visitas && c.visitas.some(v => diffDays(v) <= 30)).length;
 
-  const kpis = [
-    { id: 'total', label: 'Ativos', val: total, list: clientes },
-    { id: 'crit', label: 'Críticos', val: criticos.length, list: criticos },
-    { id: 'nunca', label: 'Nunca', val: nunca.length, list: nunca },
-    { id: 'v30', label: 'Visitas 30d', val: v30.length, list: v30 }
+  const kpiConfigs = [
+    { key: 'total', num: total, color: '', label: 'Clientes ativos', html: () => listaClientesHtml(clientes, 'Nenhum cliente cadastrado.') },
+    { key: 'sem60', num: semVisita60, color: 'var(--red)', label: 'Sem visita +60 dias', html: () => listaClientesHtml(clientes.filter(c => { const d = diffDays(c.ultimaVisita); return d === null || d > 60; }), 'Nenhum cliente nessa situação 🎉') },
+    { key: 'nunca', num: nuncaVisitado, color: 'var(--amber)', label: 'Nunca visitados', html: () => listaClientesHtml(clientes.filter(c => !c.ultimaVisita), 'Todos já foram visitados alguma vez.') },
+    { key: 'visitas30', num: visitas30, color: 'var(--green)', label: 'Visitas últimos 30d', html: () => listaVisitasHtml(clientes.filter(c => c.visitas && c.visitas.some(v => diffDays(v) <= 30)).map(c => ({ c, data: c.visitas.filter(v => diffDays(v) <= 30).sort().reverse()[0] })), 'Nenhuma visita nos últimos 30 dias.') },
   ];
 
-  document.getElementById('dashKpis').innerHTML = kpis.map(k => `
-    <div class="dash-card" onclick="toggleKpiDetail('${k.id}')">
-      <div class="dash-num">${k.val}</div>
+  document.getElementById('dashGrid').innerHTML = kpiConfigs.map(k => `
+    <div class="dash-card" onclick="toggleDashKpi('${k.key}')">
+      <div class="dash-num" style="color:${k.color || 'var(--accent)'}">${k.num}</div>
       <div class="dash-label">${k.label}</div>
     </div>
   `).join('');
 
-  if(expandedKpi) {
-    const k = kpis.find(x => x.id === expandedKpi);
-    document.getElementById('dashDetails').innerHTML = `
-      <div style="background:#fff; padding:15px; border-radius:14px; border:1px solid var(--border)">
-        <div style="font-weight:700; margin-bottom:10px; font-size:13px">${k.label.toUpperCase()}</div>
-        ${k.list.slice(0,10).map(i => `<div style="font-size:12px; padding:6px 0; border-bottom:1px solid #f0f0f0">${i.nome}</div>`).join('')}
-      </div>
-    `;
-  } else {
-    document.getElementById('dashDetails').innerHTML = '';
-  }
-
-  document.getElementById('listCriticos').innerHTML = criticos.slice(0,5).map(c => `
-    <div class="dash-list-item" onclick="openEditDrawer('${c.id}')">
-      <span>${c.nome}</span>
-      <span style="color:var(--red); font-weight:700">${diffDays(c.ultimaVisita) ?? '∞'}d</span>
+  document.getElementById('dashDetail').innerHTML = dashKpiOpen ? `
+    <div class="dash-card" style="padding-top:10px">
+      <div class="dash-card-title">${kpiConfigs.find(k=>k.key===dashKpiOpen).label}</div>
+      <div class="expand-list">${kpiConfigs.find(k=>k.key===dashKpiOpen).html()}</div>
     </div>
-  `).join('');
+  ` : '';
 
-  const atencao = clientes.filter(c => diffDays(c.ultimaCompra) &lt;= 45 && (diffDays(c.ultimaVisita) > 30 || !c.ultimaVisita));
-  document.getElementById('listAtencao').innerHTML = atencao.slice(0,5).map(c => `
-    <div class="dash-list-item" onclick="openEditDrawer('${c.id}')">
-      <span>${c.nome}</span>
-      <span style="color:var(--amber)">⚠️</span>
+  const semVisitaLista = clientes.map(c => ({ c, info: urgenciaInfo(c) }))
+    .filter(x => x.info.label.includes('Nunca') || x.info.label.includes('60'))
+    .sort((a,b) => {
+      if (a.info.label === 'Nunca visitado' && b.info.label === 'Nunca visitado') return 0;
+      if (a.info.label === 'Nunca visitado') return -1; if (b.info.label === 'Nunca visitado') return 1;
+      return parseInt(b.info.label) - parseInt(a.info.label);
+    });
+  document.getElementById('semVisitaLista').innerHTML = semVisitaLista.length ? semVisitaLista.map(x => `
+    <div class="attn-row" onclick="openEditDrawer('${x.c.id}')">
+      <div class="attn-name">${x.c.nome}</div>
+      <div class="attn-days" style="color:${x.info.label==='Nunca visitado'?'var(--red)':'var(--red)'}">${x.info.label}</div>
     </div>
-  `).join('');
+  `).join('') : '<div style="color:var(--muted);font-size:13px">Tudo em dia 🎉</div>';
+
+  const compraVsVisita = clientes
+    .filter(c => c.ultimaCompra && diffDays(c.ultimaCompra) <= 60)
+    .map(c => ({ c, diasCompra: diffDays(c.ultimaCompra), diasVisita: diffDays(c.ultimaVisita) }))
+    .filter(x => x.diasVisita === null || x.diasVisita > 30)
+    .sort((a,b) => (b.diasCompra||0) - (a.diasCompra||0));
+  document.getElementById('compraVsVisitaLista').innerHTML = compraVsVisita.length ? compraVsVisita.map(x => `
+    <div class="attn-row" onclick="openEditDrawer('${x.c.id}')">
+      <div class="attn-name">${x.c.nome}<br><span style="color:var(--muted);font-size:11.5px">Comprou há ${x.diasCompra}d</span></div>
+      <div class="attn-days" style="color:var(--amber)">${x.diasVisita===null?'Nunca visitado':x.diasVisita+'d s/ visita'}</div>
+    </div>
+  `).join('') : '<div style="color:var(--muted);font-size:13px">Nenhum caso de atenção agora.</div>';
 }
 
-function toggleKpiDetail(id) {
-  expandedKpi = expandedKpi === id ? null : id;
+function toggleDashKpi(key) {
+  dashKpiOpen = dashKpiOpen === key ? null : key;
   renderDashboard();
 }
 
-// --- ACTIONS ---
-function showView(v) {
-  document.getElementById('view-lista').style.display = v === 'lista' ? 'block' : 'none';
-  document.getElementById('view-dashboard').style.display = v === 'dashboard' ? 'block' : 'none';
-  document.getElementById('tab-lista').classList.toggle('active', v === 'lista');
-  document.getElementById('tab-dash').classList.toggle('active', v === 'dashboard');
-  if(v === 'dashboard') renderDashboard();
-}
-
-function openNovoDrawer() {
-  document.getElementById('drawerOverlay').classList.add('open');
-  document.getElementById('drawerNovo').classList.add('open');
-}
-
-function openEditDrawer(id) {
-  const c = clientes.find(x => x.id === id);
-  document.getElementById('editId').value = c.id;
-  document.getElementById('editNome').value = c.nome;
-  document.getElementById('editCompra').value = c.ultimaCompra || '';
-  renderVisitasEdit(c);
-  document.getElementById('drawerOverlay').classList.add('open');
-  document.getElementById('drawerEdit').classList.add('open');
-}
-
-function renderVisitasEdit(c) {
-  const list = c.visitas || [];
-  document.getElementById('editVisitasLista').innerHTML = list.sort().reverse().map(v => `
-    <div style="display:flex; justify-content:space-between; padding:8px; background:var(--bg); border-radius:6px; margin-bottom:4px; font-size:13px">
-      <span>${fmtDate(v)}</span>
-      <span style="color:var(--red)" onclick="removerVisita('${v}')">Remover</span>
+function listaClientesHtml(lista, vazio) {
+  if (!lista.length) return `<div class="expand-list-empty">${vazio}</div>`;
+  return lista.map(c => `
+    <div class="attn-row" onclick="event.stopPropagation(); openEditDrawer('${c.id}')">
+      <div class="attn-name">${c.nome}</div>
+      <div class="attn-days" style="color:var(--muted);font-weight:500">${c.origem}</div>
     </div>
   `).join('');
 }
 
-function closeAllDrawers() {
-  document.querySelectorAll('.drawer, .drawer-overlay').forEach(el => el.classList.remove('open'));
+function listaVisitasHtml(lista, vazio) {
+  if (!lista.length) return `<div class="expand-list-empty">${vazio}</div>`;
+  return lista.map(x => `
+    <div class="attn-row" onclick="event.stopPropagation(); openEditDrawer('${x.c.id}')">
+      <div class="attn-name">${x.c.nome}</div>
+      <div class="attn-days" style="color:var(--muted);font-weight:500">${fmtDate(x.data)}</div>
+    </div>
+  `).join('');
 }
 
-function salvarNovo() {
-  const nome = document.getElementById('novoNome').value;
-  if(!nome) return showToast('Nome é obrigatório');
-  const novo = {
-    id: Date.now().toString(),
-    nome,
-    cnpj: document.getElementById('novoCnpj').value,
-    contato: document.getElementById('novoContato').value,
-    ultimaCompra: document.getElementById('novoCompra').value,
-    origem: document.querySelector('input[name="novoOrigem"]:checked').value,
-    visitas: [],
-    ultimaVisita: null
-  };
-  clientes.push(novo);
-  saveClientes();
-  closeAllDrawers();
-  renderLista();
-  showToast('Cliente salvo!');
+/* ======================= DRAWERS ======================= */
+function openNovoDrawer() {
+  document.getElementById('novoOverlay').classList.add('open');
+  document.getElementById('novoDrawer').classList.add('open');
+}
+function closeNovoDrawer() {
+  document.getElementById('novoOverlay').classList.remove('open');
+  document.getElementById('novoDrawer').classList.remove('open');
 }
 
-function salvarEdicao() {
-  const id = document.getElementById('editId').value;
-  const idx = clientes.findIndex(x => x.id === id);
-  clientes[idx].nome = document.getElementById('editNome').value;
-  clientes[idx].ultimaCompra = document.getElementById('editCompra').value;
-  saveClientes();
-  closeAllDrawers();
-  renderLista();
-  showToast('Atualizado!');
+function openEditDrawer(id) {
+  editandoId = id;
+  const c = clientes.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('editNome').value = c.nome || '';
+  document.getElementById('editCnpj').value = c.cnpj || '';
+  document.getElementById('editContato').value = c.contato || '';
+  document.getElementById('editCompra').value = c.ultimaCompra || '';
+  document.querySelector('input[name="editOrigem"][value="'+c.origem+'"]').checked = true;
+  renderVisitas(c);
+  document.getElementById('editOverlay').classList.add('open');
+  document.getElementById('editDrawer').classList.add('open');
+}
+function closeEditDrawer() {
+  document.getElementById('editOverlay').classList.remove('open');
+  document.getElementById('editDrawer').classList.remove('open');
+  editandoId = null;
 }
 
-function addVisita() {
-  const id = document.getElementById('editId').value;
-  const data = document.getElementById('novaVisitaData').value;
-  if(!data) return;
-  const idx = clientes.findIndex(x => x.id === id);
-  if(!clientes[idx].visitas) clientes[idx].visitas = [];
-  clientes[idx].visitas.push(data);
-  clientes[idx].ultimaVisita = clientes[idx].visitas.sort().reverse()[0];
-  saveClientes();
-  renderVisitasEdit(clientes[idx]);
-  document.getElementById('novaVisitaData').value = '';
+function renderVisitas(c) {
+  const wrap = document.getElementById('editVisitasList');
+  if (!c.visitas || !c.visitas.length) {
+    wrap.innerHTML = '<div style="color:var(--muted);font-size:13px">Nenhuma visita registrada ainda.</div>';
+    return;
+  }
+  wrap.innerHTML = c.visitas.slice().sort().reverse().map(v => `
+    <div class="visit-item">
+      <span>${fmtDate(v)}</span>
+      <button onclick="removerVisita('${v}')">Remover</button>
+    </div>
+  `).join('');
 }
 
 function removerVisita(data) {
-  const id = document.getElementById('editId').value;
-  const idx = clientes.findIndex(x => x.id === id);
-  clientes[idx].visitas = clientes[idx].visitas.filter(v => v !== data);
-  clientes[idx].ultimaVisita = clientes[idx].visitas.sort().reverse()[0] || null;
+  const c = clientes.find(x => x.id === editandoId);
+  if (!c) return;
+  c.visitas = (c.visitas || []).filter(v => v !== data);
+  c.ultimaVisita = c.visitas.length ? c.visitas.sort().reverse()[0] : null;
   saveClientes();
-  renderVisitasEdit(clientes[idx]);
+  renderVisitas(c);
+  renderLista();
+  renderUrgChips();
+  showToast('Visita removida');
+}
+
+function addVisita() {
+  const inp = document.getElementById('editNovaVisita');
+  if (!inp.value) return;
+  const c = clientes.find(x => x.id === editandoId);
+  if (!c) return;
+  if (!c.visitas) c.visitas = [];
+  c.visitas.push(inp.value);
+  c.ultimaVisita = c.visitas.sort().reverse()[0];
+  saveClientes();
+  renderVisitas(c);
+  renderLista();
+  renderUrgChips();
+  inp.value = '';
+  showToast('Visita adicionada');
+}
+
+/* ======================= CRUD ======================= */
+function salvarNovo() {
+  const nome = document.getElementById('novoNome').value.trim();
+  if (!nome) { showToast('Digite o nome do cliente'); return; }
+  const origem = document.querySelector('input[name="novoOrigem"]:checked').value;
+  const novo = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    nome,
+    cnpj: document.getElementById('novoCnpj').value.trim(),
+    contato: document.getElementById('novoContato').value.trim(),
+    ultimaCompra: document.getElementById('novoCompra').value,
+    origem,
+    visitas: [],
+    ultimaVisita: null,
+    criadoEm: todayISO(),
+  };
+  clientes.push(novo);
+  saveClientes();
+  closeNovoDrawer();
+  document.getElementById('novoNome').value = '';
+  document.getElementById('novoCnpj').value = '';
+  document.getElementById('novoContato').value = '';
+  document.getElementById('novoCompra').value = '';
+  renderLista();
+  renderUrgChips();
+  showToast('Cliente cadastrado ✅');
+}
+
+function salvarEdicao() {
+  const c = clientes.find(x => x.id === editandoId);
+  if (!c) return;
+  c.nome = document.getElementById('editNome').value.trim() || c.nome;
+  c.cnpj = document.getElementById('editCnpj').value.trim();
+  c.contato = document.getElementById('editContato').value.trim();
+  c.ultimaCompra = document.getElementById('editCompra').value;
+  c.origem = document.querySelector('input[name="editOrigem"]:checked').value;
+  saveClientes();
+  closeEditDrawer();
+  renderLista();
+  renderUrgChips();
+  showToast('Cliente atualizado ✅');
 }
 
 function excluirCliente() {
-  if(!confirm('Excluir permanentemente?')) return;
-  const id = document.getElementById('editId').value;
-  clientes = clientes.filter(x => x.id !== id);
+  if (!confirm('Excluir este cliente permanentemente?')) return;
+  clientes = clientes.filter(x => x.id !== editandoId);
   saveClientes();
-  closeAllDrawers();
+  closeEditDrawer();
   renderLista();
+  renderUrgChips();
+  showToast('Cliente excluído');
 }
 
+/* ======================= CONFIG ======================= */
 function toggleConfig() {
-  document.getElementById('drawerOverlay').classList.add('open');
-  document.getElementById('modalConfig').classList.add('open');
+  document.getElementById('configOverlay').classList.toggle('open');
+  document.getElementById('configModal').classList.toggle('open');
 }
 
-async function sincronizarAgora() {
-  showToast('Sincronizando...');
-  try {
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(clientes)
-    });
-    const res = await fetch(APPS_SCRIPT_URL);
-    const data = await res.json();
-    if(data && data.length > 0) {
-      clientes = data;
-      saveClientes();
-      renderLista();
-      showToast('Sincronizado com sucesso!');
-    }
-  } catch(e) {
-    showToast('Erro ao sincronizar');
+function updateOfflineBar() {
+  const el = document.getElementById('offlineBar');
+  if (!el) return;
+  if (navigator.onLine) {
+    el.style.display = 'none';
+  } else {
+    el.style.display = 'flex';
   }
 }
 
-function exportarXLSX() {
-  const ws = XLSX.utils.json_to_sheet(clientes.map(c => ({
-    Nome: c.nome,
-    Origem: c.origem,
-    CNPJ: c.cnpj,
-    Contato: c.contato,
-    UltimaCompra: c.ultimaCompra,
-    UltimaVisita: c.ultimaVisita
-  })));
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Visitas");
-  XLSX.writeFile(wb, `Visitas_AstraJapi_${todayISO()}.xlsx`);
+/* ======================= SYNC ======================= */
+async function sincronizarAgora() {
+  if (!APPS_SCRIPT_URL) {
+    showToast('Configure a URL do Apps Script primeiro');
+    return;
+  }
+  showToast('Sincronizando...');
+  try {
+    const resp = await fetch(APPS_SCRIPT_URL + '?action=get');
+    const data = await resp.json();
+    if (data.status === 'ok' && data.dados) {
+      clientes = data.dados;
+      saveClientes();
+      renderLista();
+      renderUrgChips();
+      showToast('Dados sincronizados ✅');
+    } else {
+      showToast('Erro na sincronização: ' + (data.message || 'desconhecido'));
+    }
+  } catch(e) {
+    showToast('Erro de conexão: ' + e.message);
+  }
 }
 
+/* ======================= EXPORT ======================= */
+function exportarXLSX() {
+  const dados = clientes.map(c => ({
+    Cliente: c.nome,
+    CNPJ: c.cnpj || '',
+    Contato: c.contato || '',
+    Origem: c.origem,
+    'Última Compra': c.ultimaCompra || '',
+    'Última Visita': c.ultimaVisita || '',
+    'Total Visitas': (c.visitas||[]).length,
+  }));
+  const ws = XLSX.utils.json_to_sheet(dados);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
+  XLSX.writeFile(wb, 'clientes_visitas_' + todayISO() + '.xlsx');
+  showToast('Planilha exportada 📥');
+}
+
+/* ======================= TOAST ======================= */
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// --- INIT ---
+/* ======================= INIT ======================= */
 loadClientes();
 renderUrgChips();
 renderLista();
+updateOfflineBar();
 </script>
 </body>
 </html>
