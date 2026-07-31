@@ -32,14 +32,12 @@
   --shadow-lg: 0 8px 32px rgba(0,124,194,0.12);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 90px; -webkit-font-smoothing: antialiased; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 90px; -webkit-font-smoothing: antialiased; }
 
-/* ===== HEADER ===== */
 .topbar {
   background: linear-gradient(135deg, #007CC2 0%, #005A8C 100%);
   color: #fff; position: sticky; top: 0; z-index: 100;
   box-shadow: 0 4px 24px rgba(0,92,140,0.3);
-  backdrop-filter: blur(10px);
 }
 .topbar-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 12px; }
 .brand { display: flex; align-items: center; gap: 12px; }
@@ -58,18 +56,15 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 .offline-bar { background: var(--amber); color: #fff; text-align: center; font-size: 12px; padding: 6px; display: none; font-weight: 500; }
 .offline-bar.show { display: block; }
 
-/* ===== SEARCH ===== */
 .search-wrap { padding: 16px 18px 10px; position: relative; }
 .search-input {
   width: 100%; padding: 14px 18px 14px 48px; border: 1.5px solid var(--border);
   border-radius: var(--radius-sm); font-size: 15px; background: var(--surface);
-  color: var(--text); outline: none; transition: all .2s;
-  box-shadow: var(--shadow-sm);
+  color: var(--text); outline: none; transition: all .2s; box-shadow: var(--shadow-sm);
 }
 .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0,124,194,0.1); }
 .search-icon { position: absolute; left: 32px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 18px; pointer-events: none; }
 
-/* ===== CHIPS ===== */
 .chip-row { display: flex; gap: 8px; padding: 0 18px 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .chip-row::-webkit-scrollbar { display: none; }
 .chip {
@@ -83,7 +78,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 .chip-amber.active { background: var(--amber); border-color: var(--amber); box-shadow: 0 2px 8px rgba(232,145,0,0.3); }
 .chip-green.active { background: var(--green); border-color: var(--green); box-shadow: 0 2px 8px rgba(30,142,90,0.3); }
 
-/* ===== SELECTS ===== */
 .select-row { display: flex; gap: 10px; padding: 0 18px 12px; }
 .select-row select {
   flex: 1; padding: 11px 12px; border-radius: var(--radius-sm);
@@ -93,7 +87,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 }
 .select-row select:focus { border-color: var(--accent); }
 
-/* ===== TABS ===== */
 .tabs { display: flex; padding: 0 18px; gap: 4px; margin-bottom: 6px; }
 .tab {
   flex: 1; padding: 11px 4px; border: none; background: transparent;
@@ -102,7 +95,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 }
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
 
-/* ===== CARDS ===== */
 .card {
   background: var(--surface); border-radius: var(--radius); padding: 16px 18px;
   margin: 0 18px 12px; box-shadow: var(--shadow); border: 1px solid var(--border);
@@ -120,11 +112,9 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 .badge-Astra { background: var(--red); color: #fff; }
 .badge-Japi { background: var(--accent); color: #fff; }
 
-/* ===== EMPTY STATE ===== */
 .empty-state { text-align: center; padding: 60px 24px; color: var(--muted); }
 .empty-state div:first-child { font-size: 40px; margin-bottom: 14px; opacity: 0.5; }
 
-/* ===== BOTTOM NAV ===== */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface);
   display: flex; border-top: 1px solid var(--border); z-index: 100;
@@ -141,7 +131,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 .nav-btn.active .nav-icon { transform: scale(1.1); }
 .nav-btn:active .nav-icon { transform: scale(0.9); }
 
-/* ===== DRAWERS ===== */
 .overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200;
   opacity: 0; pointer-events: none; transition: opacity .3s; backdrop-filter: blur(4px);
@@ -168,7 +157,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 .close-btn:hover { background: var(--red-light); color: var(--red); }
 .drawer-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 16px; }
 
-/* ===== FORM FIELDS ===== */
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field label { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
 .field input, .field select, .field textarea {
@@ -179,7 +167,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
   border-color: var(--accent); background: #fff; box-shadow: 0 0 0 4px rgba(0,124,194,0.08);
 }
 
-/* ===== ORIGIN PILLS ===== */
 .origin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .origin-pill {
   padding: 14px 6px; border-radius: var(--radius-sm); border: 2px solid var(--border);
@@ -189,7 +176,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 .origin-pill.sel-Astra { background: var(--red-light); border-color: var(--red); color: var(--red); }
 .origin-pill.sel-Japi { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
 
-/* ===== VISIT HISTORY ===== */
 .visit-list { display: flex; flex-direction: column; gap: 8px; }
 .visit-item {
   display: flex; align-items: center; justify-content: space-between;
@@ -201,7 +187,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 .add-visit-row { display: flex; gap: 10px; }
 .add-visit-row input { flex: 1; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 16px; background: var(--bg); outline: none; }
 
-/* ===== BUTTONS ===== */
 .btn-ghost {
   background: var(--accent-light); color: var(--accent); border: none;
   padding: 13px 16px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700;
@@ -229,7 +214,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 }
 .btn-danger:hover { background: var(--red-light); }
 
-/* ===== DASHBOARD ===== */
 .dash-wrap { padding: 0 18px 24px; }
 .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
 .kpi-card {
@@ -263,7 +247,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 .attn-name { flex: 1; padding-right: 10px; }
 .attn-days { font-weight: 700; font-size: 13px; flex-shrink: 0; }
 
-/* ===== TOAST ===== */
 .toast {
   position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
   background: #1A2332; color: #fff; padding: 13px 24px; border-radius: 30px;
@@ -273,7 +256,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ===== CONFIG ===== */
 .cfg-body p { font-size: 14px; line-height: 1.7; color: var(--text); margin-bottom: 12px; }
 .cfg-body code { background: var(--gray-light); padding: 3px 8px; border-radius: 6px; font-size: 13px; }
 .cfg-body a { color: var(--accent); font-weight: 600; }
@@ -411,7 +393,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 <div class="toast" id="toast"></div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLmRWS2ROSPxvTFfcFKQSpy8u0Q7LpkMzSJvzVqPjrCJ1D2kPiJ8w5fFIzNCV04rM9/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9dNP0V3nFAdMs-8qiCwa-dfAr-GWKFCfSxYEHlehp5v6oNJESzTyIUkgUG9BbBdeu/exec';
 
 let clientes = [];
 let editingId = null;
@@ -746,99 +728,3 @@ function addVisitaHoje() {
 
 function removerVisita(data) {
   const c = clientes.find(x => x.id === editingId);
-  if (!c) return;
-  c.visitas = (c.visitas || []).filter(v => v !== data);
-  saveClientes();
-  openEditDrawer(editingId);
-  showToast('Visita removida');
-}
-
-function handleSyncClick() {
-  if (!APPS_SCRIPT_URL) {
-    document.getElementById('overlay').classList.add('show');
-    document.getElementById('cfgDrawer').classList.add('open');
-    return;
-  }
-  if (!navigator.onLine) { showToast('Sem conexão — não é possível sincronizar agora'); return; }
-  syncWithSheet();
-}
-
-async function syncWithSheet() {
-  if (syncing) return;
-  syncing = true;
-  document.getElementById('syncLabel').textContent = 'Sincronizando...';
-  try {
-    const res = await fetch(APPS_SCRIPT_URL);
-    if (!res.ok) throw new Error('GET falhou');
-    const remoto = await res.json();
-    if (Array.isArray(remoto) && remoto.length) clientes = remoto;
-
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(clientes)
-    });
-
-    saveClientes();
-    if (currentView === 'lista') renderLista(); else renderDashboard();
-    renderUrgChips();
-    showToast('Sincronizado com a planilha ✅');
-  } catch (e) {
-    showToast('Falha ao sincronizar. Confira a URL configurada.');
-  }
-  document.getElementById('syncLabel').textContent = 'Sincronizar';
-  syncing = false;
-}
-
-function maybeAutoSync() {
-  if (APPS_SCRIPT_URL && navigator.onLine) syncWithSheet();
-}
-
-function exportExcel() {
-  const linhas = clientes.map(c => {
-    const uv = ultimaVisita(c);
-    const info = urgenciaInfo(c);
-    return {
-      'CNPJ': c.cnpj || '',
-      'Nome Cliente': c.nome,
-      'Origem': c.origem,
-      'Contato': c.contato || '',
-      'Última Compra': fmtDate(c.ultimaCompra),
-      'Última Visita': uv ? fmtDate(uv) : 'Nunca visitado',
-      'Dias sem Visita': info.dias === null ? 'Nunca visitado' : info.dias,
-      'Histórico de Visitas': (c.visitas || []).slice().sort().map(fmtDate).join(', ')
-    };
-  });
-  const ws = XLSX.utils.json_to_sheet(linhas);
-  ws['!cols'] = [{wch:18},{wch:38},{wch:9},{wch:34},{wch:14},{wch:14},{wch:14},{wch:50}];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
-  XLSX.writeFile(wb, 'clientes_visitas_' + todayISO() + '.xlsx');
-  showToast('Planilha exportada 📥');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-function updateOfflineBar() {
-  const el = document.getElementById('offlineBar');
-  if (navigator.onLine) el.classList.remove('show');
-  else el.classList.add('show');
-}
-
-window.addEventListener('online', updateOfflineBar);
-window.addEventListener('offline', updateOfflineBar);
-
-loadClientes();
-renderUrgChips();
-renderLista();
-updateOfflineBar();
-maybeAutoSync();
-</script>
-</body>
-</html>
