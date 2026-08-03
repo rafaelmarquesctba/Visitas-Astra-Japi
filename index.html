@@ -668,6 +668,7 @@ function salvarNovo() {
   };
   clientes.push(novo);
   saveClientes();
+  pushToCloud();
   closeAllDrawers();
   renderLista();
   renderUrgChips();
@@ -683,6 +684,7 @@ function salvarEdicao() {
   c.contato = document.getElementById('e-contato').value.trim();
   c.ultimaCompra = document.getElementById('e-ultima').value || null;
   saveClientes();
+  pushToCloud();
   closeAllDrawers();
   renderLista();
   renderUrgChips();
@@ -694,6 +696,7 @@ function excluirCliente() {
   if (!confirm('Excluir este cliente permanentemente?')) return;
   clientes = clientes.filter(x => x.id !== editingId);
   saveClientes();
+  pushToCloud();
   closeAllDrawers();
   renderLista();
   renderUrgChips();
@@ -710,6 +713,7 @@ function addVisita() {
   if (c.visitas.includes(data)) { showToast('Visita já registrada'); return; }
   c.visitas.push(data);
   saveClientes();
+  pushToCloud();
   openEditDrawer(editingId);
   showToast('Visita adicionada');
 }
@@ -722,9 +726,121 @@ function addVisitaHoje() {
   if (c.visitas.includes(hoje)) { showToast('Visita de hoje já registrada'); return; }
   c.visitas.push(hoje);
   saveClientes();
+  pushToCloud();
   openEditDrawer(editingId);
   showToast('Visita de hoje registrada');
 }
 
 function removerVisita(data) {
   const c = clientes.find(x => x.id === editingId);
+  if (!c) return;
+  if (!confirm('Remover esta visita?')) return;
+  c.visitas = (c.visitas || []).filter(v => v !== data);
+  saveClientes();
+  pushToCloud();
+  openEditDrawer(editingId);
+  showToast('Visita removida');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function exportExcel() {
+  if (typeof XLSX === 'undefined') { showToast('Biblioteca de Excel não carregou. Verifique sua conexão.'); return; }
+  const rows = clientes.map(c => ({
+    'Nome': c.nome || '',
+    'CNPJ': c.cnpj || '',
+    'Origem': c.origem || '',
+    'Contato': c.contato || '',
+    'Última Compra': c.ultimaCompra ? fmtDate(c.ultimaCompra) : '',
+    'Última Visita': ultimaVisita(c) ? fmtDate(ultimaVisita(c)) : 'Nunca',
+    'Qtd. Visitas': (c.visitas || []).length,
+    'Todas as Visitas': (c.visitas || []).slice().sort().reverse().map(fmtDate).join(', ')
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
+  XLSX.writeFile(wb, 'visitas_astra_japi_' + todayISO() + '.xlsx');
+  showToast('Excel exportado');
+}
+
+// Envia os dados locais pra planilha em segundo plano, sem travar a UI.
+// Como o POST no Apps Script SOBRESCREVE a planilha inteira, isso só roda
+// depois de alterações locais reais (nunca de forma automática/periódica),
+// pra planilha sempre refletir o estado mais recente deste aparelho.
+async function pushToCloud() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('AKfycb') === -1) return;
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(clientes)
+    });
+    document.getElementById('offlineBar').classList.remove('show');
+  } catch (e) {
+    document.getElementById('offlineBar').classList.add('show');
+  }
+}
+
+// Botão "Sincronizar" = PUXAR da planilha (pra trazer o que foi feito em
+// outro aparelho). Como o backend sobrescreve tudo sem mesclar, pedimos
+// confirmação sempre que isso pode descartar dados daqui que ainda não
+// foram enviados pra nuvem.
+async function handleSyncClick() {
+  if (syncing) return;
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('AKfycb') === -1) {
+    showToast('Sincronização não configurada ainda.');
+    return;
+  }
+  syncing = true;
+  const label = document.getElementById('syncLabel');
+  if (label) label.textContent = 'Sincronizando...';
+  try {
+    const resp = await fetch(APPS_SCRIPT_URL);
+    const remoto = await resp.json();
+    if (!Array.isArray(remoto)) {
+      showToast('Resposta da planilha inválida. Nada foi alterado.');
+      return;
+    }
+    document.getElementById('offlineBar').classList.remove('show');
+
+    if (remoto.length === 0 && clientes.length > 0) {
+      const enviar = confirm('A planilha está vazia, mas você tem ' + clientes.length + ' cliente(s) salvos aqui. Enviar os dados locais para a planilha agora?');
+      if (enviar) { await pushToCloud(); showToast('Dados locais enviados para a planilha.'); }
+      return;
+    }
+    if (remoto.length < clientes.length) {
+      const ok = confirm('A planilha tem menos clientes (' + remoto.length + ') do que este aparelho (' + clientes.length + '). Baixar mesmo assim? Isso vai substituir os dados daqui.');
+      if (!ok) return;
+    }
+    clientes = remoto.map(c => ({ ...c, visitas: Array.isArray(c.visitas) ? c.visitas : [] }));
+    saveClientes();
+    renderLista();
+    renderUrgChips();
+    if (currentView === 'dash') renderDashboard();
+    showToast('Sincronizado com a planilha');
+  } catch (e) {
+    document.getElementById('offlineBar').classList.add('show');
+    showToast('Sem conexão — dados locais preservados');
+  } finally {
+    syncing = false;
+    if (label) label.textContent = 'Sincronizar';
+  }
+}
+
+
+window.addEventListener('online', () => document.getElementById('offlineBar').classList.remove('show'));
+window.addEventListener('offline', () => document.getElementById('offlineBar').classList.add('show'));
+
+// Inicialização
+loadClientes();
+renderUrgChips();
+renderLista();
+</script>
+</body>
+</html>
