@@ -260,4 +260,318 @@ function cleanDate(d) {
   if (d.indexOf('T') !== -1) d = d.split('T')[0];
   if (d.length >= 10 && d.indexOf('-') === 4) return d.substring(0, 10);
   var match = d.match(/^(\w{3})\s+(\w{3})\s+(\d{2})\s+(\d{4})/);
-  if
+  if (match) {
+    var meses = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var mi = meses.indexOf(match[2]);
+    if (mi >= 0) {
+      var mm = (mi + 1).toString();
+      if (mm.length < 2) mm = '0' + mm;
+      return match[4] + '-' + mm + '-' + match[3];
+    }
+  }
+  return null;
+}
+
+function todayISO() { return new Date().toISOString().split('T')[0]; }
+
+function diasDesde(d) {
+  if (!d) return null;
+  d = cleanDate(d); if (!d) return null;
+  var t = new Date(d + 'T00:00:00'); if (isNaN(t.getTime())) return null;
+  return Math.floor((Date.now() - t.getTime()) / 86400000);
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  d = cleanDate(d); if (!d) return '—';
+  var p = d.split('-'); if (p.length < 3) return '—';
+  return p[2] + '/' + p[1] + '/' + p[0];
+}
+
+function ultimaVisita(c) {
+  if (c.visitas && c.visitas.length) {
+    var limpas = c.visitas.map(function(v) { return cleanDate(v); }).filter(function(v) { return v; });
+    if (limpas.length) return limpas.sort().reverse()[0];
+  }
+  return cleanDate(c.ultimaVisita) || null;
+}
+
+function urgenciaInfo(c) {
+  var uv = ultimaVisita(c);
+  if (!uv) return { dias: null, cor: 'red', label: 'Nunca visitado' };
+  var dias = diasDesde(uv);
+  if (dias === null) return { dias: null, cor: 'red', label: 'Data inválida' };
+  if (dias > 60) return { dias: dias, cor: 'red', label: dias + ' dias sem visita' };
+  if (dias > 30) return { dias: dias, cor: 'amber', label: dias + ' dias sem visita' };
+  return { dias: dias, cor: 'green', label: dias + ' dias sem visita' };
+}
+
+function normalizeOrigem(o) {
+  if (!o) return 'Astra';
+  var v = o.toString().toUpperCase().trim();
+  if (v === 'AS' || v === 'ASTRA') return 'Astra';
+  if (v === 'JAPI') return 'Japi';
+  return 'Astra';
+}
+
+function loadClientes() {
+  try {
+    var raw = localStorage.getItem('visitas_clientes');
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        clientes = parsed;
+        return;
+      }
+    }
+  } catch (e) {}
+  clientes = [];
+  saveClientes();
+}
+
+function saveClientes() { localStorage.setItem('visitas_clientes', JSON.stringify(clientes)); }
+
+function renderUrgChips() {
+  var wrap = document.getElementById('urgChips');
+  var total = clientes.length;
+  var sem60 = clientes.filter(function(c) { var d = diasDesde(ultimaVisita(c)); return d === null || d > 60; }).length;
+  var nunca = clientes.filter(function(c) { return !ultimaVisita(c); }).length;
+  var ok = total - sem60;
+  wrap.innerHTML = '<button class="chip ' + (chipFilter==='all'?'active':'') + '" onclick="setChip(\'all\',this)">Todos (' + total + ')</button>' +
+    '<button class="chip chip-red ' + (chipFilter==='red'?'active':'') + '" onclick="setChip(\'red\',this)">🔴 ' + sem60 + ' críticos</button>' +
+    '<button class="chip chip-amber ' + (chipFilter==='amber'?'active':'') + '" onclick="setChip(\'amber\',this)">🟡 ' + nunca + ' nunca</button>' +
+    '<button class="chip chip-green ' + (chipFilter==='green'?'active':'') + '" onclick="setChip(\'green\',this)">🟢 ' + ok + ' ok</button>';
+}
+
+function setChip(f, el) { chipFilter = f; document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active'); }); el.classList.add('active'); renderLista(); }
+
+function renderLista() {
+  var q = document.getElementById('searchInput').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  var origem = document.getElementById('filterOrigem').value;
+  var sort = document.getElementById('sortBy').value;
+  var lista = clientes.filter(function(c) {
+    var cnome = (c.nome||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if (!cnome.includes(q)) return false;
+    var cOrigem = normalizeOrigem(c.origem);
+    if (origem !== 'Todos' && cOrigem !== origem) return false;
+    if (chipFilter === 'all') return true;
+    var info = urgenciaInfo(c);
+    if (chipFilter === 'red') return info.cor === 'red';
+    if (chipFilter === 'amber') return info.dias === null;
+    if (chipFilter === 'green') return info.cor === 'green';
+    return true;
+  });
+  if (sort === 'nome') lista.sort(function(a,b) { return (a.nome||'').localeCompare(b.nome||''); });
+  else if (sort === 'compra') lista.sort(function(a,b) { return (b.ultimaCompra||'').localeCompare(a.ultimaCompra||''); });
+  else lista.sort(function(a,b) { var da = diasDesde(ultimaVisita(a)); var db = diasDesde(ultimaVisita(b)); if (da === null && db === null) return 0; if (da === null) return -1; if (db === null) return 1; return db - da; });
+
+  var wrap = document.getElementById('clientList');
+  if (lista.length === 0) {
+    if (!syncDone) {
+      wrap.innerHTML = '<div class="empty-state"><div>⏳</div>Carregando dados...</div>';
+    } else {
+      wrap.innerHTML = '<div class="empty-state"><div>🔍</div>Nenhum cliente encontrado</div>';
+    }
+    return;
+  }
+  wrap.innerHTML = lista.map(function(c) {
+    var info = urgenciaInfo(c);
+    var cOrigem = normalizeOrigem(c.origem);
+    var badgeClass = 'badge-' + cOrigem;
+    var corLabel = info.cor === 'red' ? 'var(--red)' : (info.cor === 'amber' ? 'var(--amber)' : 'var(--green)');
+    var urgClass = 'urg-' + info.cor;
+    var extras = '';
+    if (c.contato) extras += '<div>👤 ' + c.contato + '</div>';
+    if (c.endereco) extras += '<div>📍 ' + c.endereco + '</div>';
+    if (c.telefone) extras += '<div>📞 ' + c.telefone + '</div>';
+    if (c.email) extras += '<div>✉️ ' + c.email + '</div>';
+    if (c.observacoes) extras += '<div>📝 ' + c.observacoes + '</div>';
+    return '<div class="card ' + urgClass + '" onclick="openEditDrawer(\'' + c.id + '\')">' +
+      '<div class="card-top"><div class="card-name">' + (c.nome||'') + '</div>' +
+      '<span class="badge ' + badgeClass + '">' + cOrigem + '</span></div>' +
+      '<div class="card-meta"><span style="color:' + corLabel + ';font-weight:700">' + info.label + '</span>' +
+      '<span>·</span><span>Última compra: ' + fmtDate(c.ultimaCompra) + '</span></div>' +
+      (extras ? '<div class="card-extra">' + extras + '</div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function switchView(v) {
+  currentView = v;
+  document.getElementById('view-lista').style.display = v === 'lista' ? 'block' : 'none';
+  document.getElementById('view-dash').style.display = v === 'dash' ? 'block' : 'none';
+  document.getElementById('tabLista').classList.toggle('active', v === 'lista');
+  document.getElementById('tabDash').classList.toggle('active', v === 'dash');
+  document.getElementById('navLista').classList.toggle('active', v === 'lista');
+  document.getElementById('navDash').classList.toggle('active', v === 'dash');
+  if (v === 'dash') renderDashboard();
+}
+
+function renderDashboard() {
+  var total = clientes.length;
+  var astra = clientes.filter(function(c) { return normalizeOrigem(c.origem) === 'Astra'; });
+  var japi = clientes.filter(function(c) { return normalizeOrigem(c.origem) === 'Japi'; });
+  var listaSem60 = clientes.filter(function(c) { var d = diasDesde(ultimaVisita(c)); return d === null || d > 60; });
+  var listaNunca = clientes.filter(function(c) { return !ultimaVisita(c); });
+  var listaVisitas30 = clientes.filter(function(c) { return c.visitas && c.visitas.some(function(v) { return diasDesde(v) !== null && diasDesde(v) <= 30; }); });
+  var ordemVisita = clientes.slice().sort(function(a,b) { var da = diasDesde(ultimaVisita(a)); var db = diasDesde(ultimaVisita(b)); if (da === null && db === null) return 0; if (da === null) return -1; if (db === null) return 1; return db - da; }).slice(0, 15);
+  var kpiConfigs = [
+    { key:'total', num:total, color:'', label:'Total de clientes', html:function(){return listaClientesHtml(clientes,'Nenhum cliente.');} },
+    { key:'astra', num:astra.length, color:'var(--red)', label:'Clientes Astra', html:function(){return listaClientesHtml(astra,'Nenhum cliente Astra.');} },
+    { key:'japi', num:japi.length, color:'var(--accent)', label:'Clientes Japi', html:function(){return listaClientesHtml(japi,'Nenhum cliente Japi.');} },
+    { key:'sem60', num:listaSem60.length, color:'var(--red)', label:'Sem visita +60d', html:function(){return listaClientesHtml(listaSem60,'Nenhum.');} },
+    { key:'nunca', num:listaNunca.length, color:'var(--amber)', label:'Nunca visitados', html:function(){return listaClientesHtml(listaNunca,'Todos visitados.');} },
+    { key:'visitas30', num:listaVisitas30.length, color:'var(--green)', label:'Visitas 30d', html:function(){return listaClientesHtml(listaVisitas30,'Nenhuma.');} },
+  ];
+  var wrap = document.getElementById('view-dash');
+  wrap.innerHTML = '<div class="dash-wrap">' +
+    '<div class="kpi-grid">' + kpiConfigs.map(function(k) { return '<div class="kpi-card ' + (dashKpiOpen===k.key?'open':'') + '" onclick="toggleKpi(\'' + k.key + '\')"><div class="kpi-num" style="' + (k.color?'color:'+k.color:'') + '">' + k.num + '</div><div class="kpi-label">' + k.label + '</div></div>'; }).join('') + '</div>' +
+    (dashKpiOpen ? '<div class="dash-card"><div class="dash-card-title">' + kpiConfigs.find(function(k){return k.key===dashKpiOpen;}).label + '</div><div class="expand-list">' + kpiConfigs.find(function(k){return k.key===dashKpiOpen;}).html() + '</div></div>' : '') +
+    '<div class="dash-card"><div class="dash-card-title">🔴 Ordem de necessidade de visita</div>' + (ordemVisita.length ? ordemVisita.map(function(c) { var info = urgenciaInfo(c); var cor = info.dias === null ? 'var(--red)' : (info.dias > 60 ? 'var(--red)' : 'var(--amber)'); return '<div class="attn-row" onclick="openEditDrawer(\'' + c.id + '\')"><div class="attn-name">' + c.nome + '</div><div class="attn-days" style="color:' + cor + '">' + (info.dias === null ? 'Nunca' : info.dias + 'd') + '</div></div>'; }).join('') : '<div style="color:var(--muted);font-size:13px">Nenhum cliente.</div>') + '</div>' +
+  '</div>';
+}
+
+function toggleKpi(key) { dashKpiOpen = dashKpiOpen === key ? null : key; renderDashboard(); }
+function listaClientesHtml(lista, vazio) { if (!lista.length) return '<div class="expand-list-empty">' + vazio + '</div>'; return lista.map(function(c) { return '<div class="attn-row" onclick="event.stopPropagation();openEditDrawer(\'' + c.id + '\')"><div class="attn-name">' + c.nome + '</div><div class="attn-days" style="color:var(--muted);font-weight:500">' + normalizeOrigem(c.origem) + '</div></div>'; }).join(''); }
+
+function openNewDrawer() {
+  ['n-nome','n-cnpj','n-contato','n-endereco','n-telefone','n-email','n-ultima','n-obs'].forEach(function(id) { document.getElementById(id).value = ''; });
+  newOrigem = 'Astra';
+  document.querySelectorAll('#n-origem-grid .origin-pill').forEach(function(p) { p.className = 'origin-pill'; });
+  document.querySelector('#n-origem-grid .origin-pill').className = 'origin-pill sel-Astra';
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('newDrawer').classList.add('open');
+}
+function selectOrigem(o, el) { newOrigem = o; document.querySelectorAll('#n-origem-grid .origin-pill').forEach(function(p) { p.className = 'origin-pill'; }); el.className = 'origin-pill sel-' + o; }
+
+function openEditDrawer(id) {
+  editingId = id;
+  var c = clientes.find(function(x) { return x.id === id; });
+  if (!c) return;
+  var cOrigem = normalizeOrigem(c.origem);
+  var visitasOrdenadas = (c.visitas || []).slice().map(function(v) { return cleanDate(v); }).filter(function(v) { return v; }).sort().reverse();
+  document.getElementById('editBody').innerHTML =
+    '<div class="field"><label>Nome do cliente</label><input type="text" id="e-nome" value="' + (c.nome||'').replace(/"/g,'&quot;') + '"></div>' +
+    '<div class="field"><label>CNPJ</label><input type="text" id="e-cnpj" value="' + (c.cnpj||'') + '"></div>' +
+    '<div class="field"><label>Origem</label><select id="e-origem"><option value="Astra" ' + (cOrigem==='Astra'?'selected':'') + '>Astra</option><option value="Japi" ' + (cOrigem==='Japi'?'selected':'') + '>Japi</option></select></div>' +
+    '<div class="field"><label>Contato / referência</label><input type="text" id="e-contato" value="' + (c.contato||'').replace(/"/g,'&quot;') + '"></div>' +
+    '<div class="field"><label>Endereço</label><input type="text" id="e-endereco" value="' + (c.endereco||'').replace(/"/g,'&quot;') + '"></div>' +
+    '<div class="field"><label>Telefone</label><input type="text" id="e-telefone" value="' + (c.telefone||'') + '"></div>' +
+    '<div class="field"><label>E-mail</label><input type="email" id="e-email" value="' + (c.email||'') + '"></div>' +
+    '<div class="field"><label>Última compra</label><input type="date" id="e-ultima" value="' + (cleanDate(c.ultimaCompra)||'') + '"></div>' +
+    '<div class="field"><label>Observações</label><textarea id="e-obs">' + (c.observacoes||'') + '</textarea></div>' +
+    '<div class="field"><label>Visitas realizadas (' + visitasOrdenadas.length + ')</label>' +
+      '<div class="visit-list">' + (visitasOrdenadas.length ? visitasOrdenadas.map(function(v) { return '<div class="visit-item"><span>' + fmtDate(v) + '</span><button onclick="removerVisita(\'' + v + '\')">Remover</button></div>'; }).join('') : '<div style="color:var(--muted);font-size:13px">Nenhuma visita registrada.</div>') + '</div>' +
+      '<div class="add-visit-row"><input type="date" id="e-nova-visita"><button class="btn-ghost" onclick="addVisita()">+ Visita</button></div>' +
+      '<button class="btn-today" onclick="addVisitaHoje()">Registrar visita hoje</button>' +
+    '</div>' +
+    '<button class="btn-primary" onclick="salvarEdicao()">Salvar alterações</button>' +
+    '<button class="btn-danger" onclick="excluirCliente()">Excluir cliente</button>';
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('editDrawer').classList.add('open');
+}
+function closeAllDrawers() { document.getElementById('overlay').classList.remove('show'); document.querySelectorAll('.drawer').forEach(function(d) { d.classList.remove('open'); }); editingId = null; }
+
+function salvarNovo() {
+  var nome = document.getElementById('n-nome').value.trim();
+  if (!nome) { showToast('Informe o nome do cliente'); return; }
+  clientes.push({ id:'c-'+Date.now()+'-'+Math.floor(Math.random()*10000), nome:nome, cnpj:document.getElementById('n-cnpj').value.trim(), contato:document.getElementById('n-contato').value.trim(), endereco:document.getElementById('n-endereco').value.trim(), telefone:document.getElementById('n-telefone').value.trim(), email:document.getElementById('n-email').value.trim(), ultimaCompra:document.getElementById('n-ultima').value||null, observacoes:document.getElementById('n-obs').value.trim(), visitas:[], origem:newOrigem });
+  saveClientes(); pushToCloud(); closeAllDrawers(); renderLista(); renderUrgChips(); showToast('Cliente cadastrado');
+}
+function salvarEdicao() {
+  var c = clientes.find(function(x) { return x.id === editingId; }); if (!c) return;
+  c.nome = document.getElementById('e-nome').value.trim() || c.nome; c.cnpj = document.getElementById('e-cnpj').value.trim(); c.origem = document.getElementById('e-origem').value; c.contato = document.getElementById('e-contato').value.trim(); c.endereco = document.getElementById('e-endereco').value.trim(); c.telefone = document.getElementById('e-telefone').value.trim(); c.email = document.getElementById('e-email').value.trim(); c.ultimaCompra = document.getElementById('e-ultima').value || null; c.observacoes = document.getElementById('e-obs').value.trim();
+  saveClientes(); pushToCloud(); closeAllDrawers(); renderLista(); renderUrgChips(); if (currentView === 'dash') renderDashboard(); showToast('Cliente atualizado');
+}
+function excluirCliente() { if (!confirm('Excluir este cliente permanentemente?')) return; clientes = clientes.filter(function(x) { return x.id !== editingId; }); saveClientes(); pushToCloud(); closeAllDrawers(); renderLista(); renderUrgChips(); if (currentView === 'dash') renderDashboard(); showToast('Cliente excluído'); }
+function addVisita() { var data = document.getElementById('e-nova-visita').value; if (!data) { showToast('Selecione uma data'); return; } var c = clientes.find(function(x) { return x.id === editingId; }); if (!c) return; if (!c.visitas) c.visitas = []; if (c.visitas.some(function(v) { return cleanDate(v) === data; })) { showToast('Visita já registrada'); return; } c.visitas.push(data); saveClientes(); pushToCloud(); openEditDrawer(editingId); showToast('Visita adicionada'); }
+function addVisitaHoje() { var c = clientes.find(function(x) { return x.id === editingId; }); if (!c) return; var hoje = todayISO(); if (!c.visitas) c.visitas = []; if (c.visitas.some(function(v) { return cleanDate(v) === hoje; })) { showToast('Visita de hoje já registrada'); return; } c.visitas.push(hoje); saveClientes(); pushToCloud(); openEditDrawer(editingId); showToast('Visita de hoje registrada'); }
+function removerVisita(data) { var c = clientes.find(function(x) { return x.id === editingId; }); if (!c) return; c.visitas = (c.visitas || []).filter(function(v) { return cleanDate(v) !== data; }); saveClientes(); pushToCloud(); openEditDrawer(editingId); showToast('Visita removida'); }
+
+function handleSyncClick() {
+  if (!APPS_SCRIPT_URL) { document.getElementById('overlay').classList.add('show'); document.getElementById('cfgDrawer').classList.add('open'); return; }
+  if (!navigator.onLine) { showToast('Sem conexão'); return; }
+  syncWithSheet();
+}
+
+async function syncWithSheet() {
+  if (syncing) return;
+  syncing = true;
+  var label = document.getElementById('syncLabel'); if (label) label.textContent = 'Sincronizando...';
+  var loadingBar = document.getElementById('loadingBar');
+  if (loadingBar) loadingBar.classList.add('show');
+  try {
+    // Cache-busting: adiciona timestamp para evitar cache do navegador
+    var url = APPS_SCRIPT_URL + '?t=' + Date.now();
+    var resp = await fetch(url, { redirect: 'follow' });
+    var text = await resp.text();
+    var remoto;
+    try { remoto = JSON.parse(text); } catch(e) { remoto = []; }
+
+    if (Array.isArray(remoto) && remoto.length > 0) {
+      clientes = remoto.map(function(c) {
+        var v = Array.isArray(c.visitas) ? c.visitas.map(function(x) { return cleanDate(x); }).filter(function(x) { return x; }) : [];
+        return {
+          id: c.id || ('c-' + Math.random().toString(36).substr(2,9)),
+          nome: c.nome || '',
+          cnpj: c.cnpj || '',
+          contato: c.contato || '',
+          endereco: c.endereco || '',
+          telefone: c.telefone || '',
+          email: c.email || '',
+          ultimaCompra: cleanDate(c.ultimaCompra),
+          observacoes: c.observacoes || '',
+          origem: normalizeOrigem(c.origem),
+          visitas: v
+        };
+      });
+      syncDone = true;
+      saveClientes();
+      renderLista();
+      renderUrgChips();
+      if (currentView === 'dash') renderDashboard();
+      showToast('Sincronizado: ' + clientes.length + ' clientes ✅');
+    } else if (clientes.length > 0) {
+      await pushToCloud();
+      showToast('Dados enviados para a planilha');
+    } else {
+      showToast('Planilha vazia');
+    }
+  } catch (e) {
+    showToast('Erro: ' + e.message.substring(0, 50));
+  }
+  if (label) label.textContent = 'Sincronizar';
+  if (loadingBar) loadingBar.classList.remove('show');
+  syncing = false;
+}
+
+async function pushToCloud() {
+  if (!APPS_SCRIPT_URL) return;
+  try {
+    await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(clientes) });
+  } catch (e) {}
+}
+
+function exportExcel() {
+  var linhas = clientes.map(function(c) { var uv = ultimaVisita(c); var info = urgenciaInfo(c); return { 'CNPJ':c.cnpj||'', 'Nome Cliente':c.nome, 'Origem':normalizeOrigem(c.origem), 'Contato':c.contato||'', 'Endereço':c.endereco||'', 'Telefone':c.telefone||'', 'E-mail':c.email||'', 'Última Compra':fmtDate(c.ultimaCompra), 'Última Visita':uv?fmtDate(uv):'Nunca visitado', 'Dias sem Visita':info.dias===null?'Nunca visitado':info.dias, 'Observações':c.observacoes||'', 'Histórico de Visitas':(c.visitas||[]).slice().sort().map(fmtDate).join(', ') }; });
+  var ws = XLSX.utils.json_to_sheet(linhas); ws['!cols'] = [{wch:18},{wch:38},{wch:9},{wch:34},{wch:30},{wch:16},{wch:28},{wch:14},{wch:14},{wch:14},{wch:40},{wch:50}];
+  var wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Clientes'); XLSX.writeFile(wb, 'clientes_visitas_' + todayISO() + '.xlsx'); showToast('Planilha exportada 📥');
+}
+
+function showToast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._timer); t._timer = setTimeout(function() { t.classList.remove('show'); }, 3000); }
+function updateOfflineBar() { var el = document.getElementById('offlineBar'); if (navigator.onLine) el.classList.remove('show'); else el.classList.add('show'); }
+window.addEventListener('online', updateOfflineBar); window.addEventListener('offline', updateOfflineBar);
+
+/* ===== INICIALIZAÇÃO ===== */
+loadClientes();
+renderUrgChips();
+renderLista();
+updateOfflineBar();
+
+/* FORÇA SINCRONIZAÇÃO AO ABRIR — com cache-busting */
+if (APPS_SCRIPT_URL && navigator.onLine) {
+  syncWithSheet();
+}
+</script>
+</body>
+</html>
