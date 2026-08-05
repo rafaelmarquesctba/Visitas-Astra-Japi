@@ -5,17 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="icon" href="logo.png" type="image/png">
 <title>Visitas — Astra & Japi</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#F0F4F8;--surface:#FFFFFF;--border:rgba(0,124,194,0.08);--text:#1A2332;--muted:#6B7A8F;--accent:#007CC2;--accent-light:#E6F3FC;--accent-dark:#005A8C;--red:#C62828;--red-light:#FDECEC;--amber:#E89100;--amber-light:#FFF6E5;--green:#1E8E5A;--green-light:#E9FAF1;--gray-light:#EEF0F3;--radius:16px;--radius-sm:10px;--shadow:0 4px 16px rgba(0,124,194,0.08);--shadow-lg:0 8px 32px rgba(0,124,194,0.12)}
+:root{--bg:#F0F4F8;--surface:#FFFFFF;--border:rgba(0,124,194,0.08);--text:#1A2332;--muted:#6B7A8F;--accent:#007CC2;--accent-light:#E6F3FC;--accent-dark:#005A8C;--red:#C62828;--red-light:#FDECEC;--amber:#E89100;--green:#1E8E5A;--green-light:#E9FAF1;--gray-light:#EEF0F3;--radius:16px;--radius-sm:10px;--shadow:0 4px 16px rgba(0,124,194,0.08);--shadow-lg:0 8px 32px rgba(0,124,194,0.12)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:90px;-webkit-font-smoothing:antialiased}
+.logo-astra{display:inline-flex;align-items:center;justify-content:center;background:#0078D7;border-radius:6px;padding:6px 8px}
+.logo-pill{background:#C62828;color:#fff;border:1.5px solid #fff;border-radius:20px;padding:2px 12px;font-size:14px;font-weight:700;letter-spacing:0.5px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.drawer-header .logo-astra{padding:3px 5px}
+.drawer-header .logo-pill{font-size:12px;padding:1px 8px}
 .topbar{background:linear-gradient(135deg,#007CC2 0%,#005A8C 100%);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,92,140,0.3)}
 .topbar-row{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px}
 .brand{display:flex;align-items:center;gap:12px}
-.brand-logo svg{height:36px;width:auto;border-radius:6px}
 .brand-title{font-size:17px;font-weight:700}
 .brand-sub{font-size:12px;opacity:0.85;margin-top:1px}
 .header-actions{display:flex;gap:8px;align-items:center}
@@ -70,7 +72,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .drawer-handle{width:40px;height:5px;background:#ddd;border-radius:3px;margin:14px auto 0}
 .drawer-header{padding:14px 22px 18px;border-bottom:2px solid var(--accent);display:flex;align-items:center;justify-content:space-between}
 .drawer-header-left{display:flex;align-items:center;gap:10px}
-.drawer-header-logo{height:28px;width:auto;border-radius:4px}
 .drawer-title{font-size:18px;font-weight:700;color:var(--accent)}
 .close-btn{width:34px;height:34px;border-radius:50%;background:var(--gray-light);border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .close-btn:hover{background:var(--red-light);color:var(--red)}
@@ -121,119 +122,91 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </head>
 <body>
 <div class="topbar">
-  <div class="topbar-row">
-    <div class="brand">
-      <div class="brand-logo">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <rect width="100" height="100" rx="12" fill="#0078D7"/>
-          <rect x="8" y="34" width="84" height="32" rx="16" fill="#C62828" stroke="#fff" stroke-width="2"/>
-          <text x="50" y="56" text-anchor="middle" fill="#fff" font-family="system-ui,-apple-system,sans-serif" font-weight="700" font-size="15" letter-spacing="0.5">astra</text>
-        </svg>
-      </div>
-      <div><div class="brand-title">Controle de Visitas</div><div class="brand-sub">Astra &amp; Japi</div></div>
-    </div>
-    <div class="header-actions">
-      <button class="sync-btn" onclick="exportExcel()">📥 Excel</button>
-      <button class="sync-btn" onclick="handleSyncClick()">⇅ <span id="syncLabel">Sincronizar</span></button>
-    </div>
-  </div>
-  <div class="loading-bar" id="loadingBar">⏳ Carregando dados da planilha...</div>
-  <div class="offline-bar" id="offlineBar">📡 Sem conexão — alterações salvas localmente</div>
+<div class="topbar-row">
+<div class="brand">
+<div class="logo-astra"><div class="logo-pill">astra</div></div>
+<div><div class="brand-title">Controle de Visitas</div><div class="brand-sub">Astra &amp; Japi</div></div>
+</div>
+<div class="header-actions">
+<button class="sync-btn" onclick="exportExcel()">📥 Excel</button>
+<button class="sync-btn" onclick="handleSyncClick()">⇅ <span id="syncLabel">Sincronizar</span></button>
+</div>
+</div>
+<div class="loading-bar" id="loadingBar">⏳ Carregando dados da planilha...</div>
+<div class="offline-bar" id="offlineBar">📡 Sem conexão — alterações salvas localmente</div>
 </div>
 <div class="search-wrap">
-  <span class="search-icon">🔍</span>
-  <input class="search-input" id="searchInput" placeholder="Buscar cliente..." oninput="renderLista()">
+<span class="search-icon">🔍</span>
+<input class="search-input" id="searchInput" placeholder="Buscar cliente..." oninput="renderLista()">
 </div>
 <div class="chip-row" id="urgChips"></div>
 <div class="select-row">
-  <select id="filterOrigem" onchange="renderLista()">
-    <option value="Todos">Todas as origens</option>
-    <option value="Astra">Astra</option>
-    <option value="Japi">Japi</option>
-  </select>
-  <select id="sortBy" onchange="renderLista()">
-    <option value="urgencia">Mais tempo sem visita</option>
-    <option value="nome">Nome (A-Z)</option>
-    <option value="compra">Última compra</option>
-  </select>
+<select id="filterOrigem" onchange="renderLista()">
+<option value="Todos">Todas as origens</option>
+<option value="Astra">Astra</option>
+<option value="Japi">Japi</option>
+</select>
+<select id="sortBy" onchange="renderLista()">
+<option value="urgencia">Mais tempo sem visita</option>
+<option value="nome">Nome (A-Z)</option>
+<option value="compra">Última compra</option>
+</select>
 </div>
 <div class="tabs">
-  <button class="tab active" id="tabLista" onclick="switchView('lista')">📋 Lista</button>
-  <button class="tab" id="tabDash" onclick="switchView('dash')">📊 Dashboard</button>
+<button class="tab active" id="tabLista" onclick="switchView('lista')">📋 Lista</button>
+<button class="tab" id="tabDash" onclick="switchView('dash')">📊 Dashboard</button>
 </div>
 <div id="view-lista"><div id="clientList"></div></div>
 <div id="view-dash" style="display:none"></div>
 <div class="overlay" id="overlay" onclick="closeAllDrawers()"></div>
 <div class="drawer" id="newDrawer">
-  <div class="drawer-handle"></div>
-  <div class="drawer-header">
-    <div class="drawer-header-left">
-      <svg class="drawer-header-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="100" rx="12" fill="#0078D7"/>
-        <rect x="8" y="34" width="84" height="32" rx="16" fill="#C62828" stroke="#fff" stroke-width="2"/>
-        <text x="50" y="56" text-anchor="middle" fill="#fff" font-family="system-ui,-apple-system,sans-serif" font-weight="700" font-size="15" letter-spacing="0.5">astra</text>
-      </svg>
-      <span class="drawer-title">Novo Cliente</span>
-    </div>
-    <button class="close-btn" onclick="closeAllDrawers()">✕</button>
-  </div>
-  <div class="drawer-body">
-    <div class="field"><label>Nome do cliente *</label><input type="text" id="n-nome" placeholder="Nome ou razão social"></div>
-    <div class="field"><label>CNPJ</label><input type="text" id="n-cnpj" placeholder="00.000.000/0000-00"></div>
-    <div class="field"><label>Contato / referência</label><input type="text" id="n-contato" placeholder="Pessoa de contato"></div>
-    <div class="field"><label>Endereço</label><input type="text" id="n-endereco" placeholder="Rua, número, bairro"></div>
-    <div class="field"><label>Telefone</label><input type="text" id="n-telefone" placeholder="(00) 00000-0000"></div>
-    <div class="field"><label>E-mail</label><input type="email" id="n-email" placeholder="email@exemplo.com"></div>
-    <div class="field"><label>Última compra</label><input type="date" id="n-ultima"></div>
-    <div class="field"><label>Origem</label><div class="origin-grid" id="n-origem-grid"><div class="origin-pill sel-Astra" onclick="selectOrigem('Astra',this)">Astra</div><div class="origin-pill" onclick="selectOrigem('Japi',this)">Japi</div></div></div>
-    <div class="field"><label>Observações</label><textarea id="n-obs" placeholder="Anotações sobre o cliente"></textarea></div>
-    <button class="btn-primary" onclick="salvarNovo()">Salvar cliente</button>
-  </div>
+<div class="drawer-handle"></div>
+<div class="drawer-header">
+<div class="drawer-header-left"><div class="logo-astra"><div class="logo-pill">astra</div></div><span class="drawer-title">Novo Cliente</span></div>
+<button class="close-btn" onclick="closeAllDrawers()">✕</button>
+</div>
+<div class="drawer-body">
+<div class="field"><label>Nome do cliente *</label><input type="text" id="n-nome" placeholder="Nome ou razão social"></div>
+<div class="field"><label>CNPJ</label><input type="text" id="n-cnpj" placeholder="00.000.000/0000-00"></div>
+<div class="field"><label>Contato / referência</label><input type="text" id="n-contato" placeholder="Pessoa de contato"></div>
+<div class="field"><label>Endereço</label><input type="text" id="n-endereco" placeholder="Rua, número, bairro"></div>
+<div class="field"><label>Telefone</label><input type="text" id="n-telefone" placeholder="(00) 00000-0000"></div>
+<div class="field"><label>E-mail</label><input type="email" id="n-email" placeholder="email@exemplo.com"></div>
+<div class="field"><label>Última compra</label><input type="date" id="n-ultima"></div>
+<div class="field"><label>Origem</label><div class="origin-grid" id="n-origem-grid"><div class="origin-pill sel-Astra" onclick="selectOrigem('Astra',this)">Astra</div><div class="origin-pill" onclick="selectOrigem('Japi',this)">Japi</div></div></div>
+<div class="field"><label>Observações</label><textarea id="n-obs" placeholder="Anotações sobre o cliente"></textarea></div>
+<button class="btn-primary" onclick="salvarNovo()">Salvar cliente</button>
+</div>
 </div>
 <div class="drawer" id="editDrawer">
-  <div class="drawer-handle"></div>
-  <div class="drawer-header">
-    <div class="drawer-header-left">
-      <svg class="drawer-header-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="100" rx="12" fill="#0078D7"/>
-        <rect x="8" y="34" width="84" height="32" rx="16" fill="#C62828" stroke="#fff" stroke-width="2"/>
-        <text x="50" y="56" text-anchor="middle" fill="#fff" font-family="system-ui,-apple-system,sans-serif" font-weight="700" font-size="15" letter-spacing="0.5">astra</text>
-      </svg>
-      <span class="drawer-title">Editar Cliente</span>
-    </div>
-    <button class="close-btn" onclick="closeAllDrawers()">✕</button>
-  </div>
-  <div class="drawer-body" id="editBody"></div>
+<div class="drawer-handle"></div>
+<div class="drawer-header">
+<div class="drawer-header-left"><div class="logo-astra"><div class="logo-pill">astra</div></div><span class="drawer-title">Editar Cliente</span></div>
+<button class="close-btn" onclick="closeAllDrawers()">✕</button>
+</div>
+<div class="drawer-body" id="editBody"></div>
 </div>
 <div class="drawer" id="cfgDrawer">
-  <div class="drawer-handle"></div>
-  <div class="drawer-header">
-    <div class="drawer-header-left">
-      <svg class="drawer-header-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="100" rx="12" fill="#0078D7"/>
-        <rect x="8" y="34" width="84" height="32" rx="16" fill="#C62828" stroke="#fff" stroke-width="2"/>
-        <text x="50" y="56" text-anchor="middle" fill="#fff" font-family="system-ui,-apple-system,sans-serif" font-weight="700" font-size="15" letter-spacing="0.5">astra</text>
-      </svg>
-      <span class="drawer-title">⚙️ Sincronização</span>
-    </div>
-    <button class="close-btn" onclick="closeAllDrawers()">✕</button>
-  </div>
-  <div class="drawer-body">
-    <p style="font-size:14px;line-height:1.7;margin-bottom:12px">Os dados são salvos localmente e sincronizados com o Google Sheets.</p>
-    <button class="btn-ghost" onclick="exportExcel()">📥 Exportar Excel</button>
-  </div>
+<div class="drawer-handle"></div>
+<div class="drawer-header">
+<div class="drawer-header-left"><div class="logo-astra"><div class="logo-pill">astra</div></div><span class="drawer-title">⚙️ Sincronização</span></div>
+<button class="close-btn" onclick="closeAllDrawers()">✕</button>
+</div>
+<div class="drawer-body">
+<p style="font-size:14px;line-height:1.7;margin-bottom:12px">Os dados são salvos localmente e sincronizados com o Google Sheets.</p>
+<button class="btn-ghost" onclick="exportExcel()">📥 Exportar Excel</button>
+</div>
 </div>
 <div class="bottom-nav">
-  <button class="nav-btn active" id="navLista" onclick="switchView('lista')"><span class="nav-icon">📋</span> Lista</button>
-  <button class="nav-btn" id="navDash" onclick="switchView('dash')"><span class="nav-icon">📊</span> Dashboard</button>
-  <button class="nav-btn" onclick="openNewDrawer()"><span class="nav-icon">➕</span> Novo</button>
+<button class="nav-btn active" id="navLista" onclick="switchView('lista')"><span class="nav-icon">📋</span> Lista</button>
+<button class="nav-btn" id="navDash" onclick="switchView('dash')"><span class="nav-icon">📊</span> Dashboard</button>
+<button class="nav-btn" onclick="openNewDrawer()"><span class="nav-icon">➕</span> Novo</button>
 </div>
 <div class="toast" id="toast"></div>
 <script>
 const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbx9dNP0V3nFAdMs-8qiCwa-dfAr-GWKFCfSxYEHlehp5v6oNJESzTyIUkgUG9BbBdeu/exec';
 let clientes=[];let editingId=null;let newOrigem='Astra';let currentView='lista';let chipFilter='all';let syncing=false;let dashKpiOpen=null;let syncDone=false;
-
-function cleanDate(d){if(!d)return null;d=d.toString().trim();if(d.indexOf('T')!==-1)d=d.split('T')[0];if(d.length>=10&&d.indexOf('-')===4)return d.substring(0,10);var m=d.match(/^(\w{3})\s+(\w{3})\s+(\d{2})\s+(\d{4})/);if(m){var meses=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];var mi=meses.indexOf(m[2]);if(mi>=0){var mm=(mi+1).toString();if(mm.length<2)mm='0'+mm;return m[4]+'-'+mm+'-'+m[3];}}return null;}
+function cleanDate(d){if(!d)return null;d=d.toString().trim();if(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(d))return d.split('T')[0];var m=d.match(/^(\w{3})\s+(\w{3})\s+(\d{2})\s+(\d{4})/);if(m){var meses=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];var mi=meses.indexOf(m[2]);if(mi>=0){var mm=(mi+1).toString();if(mm.length<2)mm='0'+mm;return m[4]+'-'+mm+'-'+m[3];}}if(d.length>=10&&d.indexOf('-')===4)return d.substring(0,10);return null;}
 function todayISO(){return new Date().toISOString().split('T')[0];}
 function tomorrowISO(){var d=new Date();d.setDate(d.getDate()+7);return d.toISOString().split('T')[0];}
 function diasDesde(d){if(!d)return null;d=cleanDate(d);if(!d)return null;var t=new Date(d+'T00:00:00');if(isNaN(t.getTime()))return null;return Math.floor((Date.now()-t.getTime())/86400000);}
@@ -241,45 +214,33 @@ function fmtDate(d){if(!d)return '—';d=cleanDate(d);if(!d)return '—';var p=d
 function ultimaVisita(c){if(c.visitas&&c.visitas.length){var l=c.visitas.map(function(v){return cleanDate(v);}).filter(function(v){return v;});if(l.length)return l.sort().reverse()[0];}return cleanDate(c.ultimaVisita)||null;}
 function urgenciaInfo(c){var uv=ultimaVisita(c);if(!uv)return{dias:null,cor:'red',label:'Nunca visitado'};var dias=diasDesde(uv);if(dias===null)return{dias:null,cor:'red',label:'Data inválida'};if(dias>60)return{dias:dias,cor:'red',label:dias+' dias sem visita'};if(dias>30)return{dias:dias,cor:'amber',label:dias+' dias sem visita'};return{dias:dias,cor:'green',label:dias+' dias sem visita'};}
 function normalizeOrigem(o){if(!o)return'Astra';var v=o.toString().toUpperCase().trim();if(v==='AS'||v==='ASTRA')return'Astra';if(v==='JAPI')return'Japi';return'Astra';}
-
 function loadClientes(){try{var raw=localStorage.getItem('visitas_clientes');if(raw){var p=JSON.parse(raw);if(Array.isArray(p)&&p.length>0){clientes=p;return;}}}catch(e){}clientes=[];saveClientes();}
 function saveClientes(){localStorage.setItem('visitas_clientes',JSON.stringify(clientes));}
-
 function renderUrgChips(){var w=document.getElementById('urgChips');var t=clientes.length;var s=clientes.filter(function(c){var d=diasDesde(ultimaVisita(c));return d===null||d>60;}).length;var n=clientes.filter(function(c){return!ultimaVisita(c);}).length;var ok=t-s;w.innerHTML='<button class="chip '+(chipFilter==='all'?'active':'')+'" onclick="setChip(\'all\',this)">Todos ('+t+')</button><button class="chip chip-red '+(chipFilter==='red'?'active':'')+'" onclick="setChip(\'red\',this)">🔴 '+s+' críticos</button><button class="chip chip-amber '+(chipFilter==='amber'?'active':'')+'" onclick="setChip(\'amber\',this)">🟡 '+n+' nunca</button><button class="chip chip-green '+(chipFilter==='green'?'active':'')+'" onclick="setChip(\'green\',this)">🟢 '+ok+' ok</button>';}
 function setChip(f,el){chipFilter=f;document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active');});el.classList.add('active');renderLista();}
-
 function renderLista(){var q=document.getElementById('searchInput').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');var origem=document.getElementById('filterOrigem').value;var sort=document.getElementById('sortBy').value;var lista=clientes.filter(function(c){var cn=(c.nome||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(!cn.includes(q))return false;var co=normalizeOrigem(c.origem);if(origem!=='Todos'&&co!==origem)return false;if(chipFilter==='all')return true;var i=urgenciaInfo(c);if(chipFilter==='red')return i.cor==='red';if(chipFilter==='amber')return i.dias===null;if(chipFilter==='green')return i.cor==='green';return true;});if(sort==='nome')lista.sort(function(a,b){return(a.nome||'').localeCompare(b.nome||'');});else if(sort==='compra')lista.sort(function(a,b){return(b.ultimaCompra||'').localeCompare(a.ultimaCompra||'');});else lista.sort(function(a,b){var da=diasDesde(ultimaVisita(a));var db=diasDesde(ultimaVisita(b));if(da===null&&db===null)return 0;if(da===null)return-1;if(db===null)return 1;return db-da;});var w=document.getElementById('clientList');if(lista.length===0){w.innerHTML=syncDone?'<div class="empty-state"><div>🔍</div>Nenhum cliente encontrado</div>':'<div class="empty-state"><div>⏳</div>Carregando dados...</div>';return;}w.innerHTML=lista.map(function(c){var i=urgenciaInfo(c);var co=normalizeOrigem(c.origem);var cl=i.cor==='red'?'var(--red)':(i.cor==='amber'?'var(--amber)':'var(--green)');var ex='';if(c.contato)ex+='<div>👤 '+c.contato+'</div>';if(c.endereco)ex+='<div>📍 '+c.endereco+'</div>';if(c.telefone)ex+='<div>📞 '+c.telefone+'</div>';if(c.email)ex+='<div>✉️ '+c.email+'</div>';if(c.observacoes)ex+='<div>📝 '+c.observacoes+'</div>';return '<div class="card urg-'+i.cor+'" onclick="openEditDrawer(\''+c.id+'\')"><div class="card-top"><div class="card-name">'+(c.nome||'')+'</div><span class="badge badge-'+co+'">'+co+'</span></div><div class="card-meta"><span style="color:'+cl+';font-weight:700">'+i.label+'</span><span>·</span><span>Última compra: '+fmtDate(c.ultimaCompra)+'</span></div>'+(ex?'<div class="card-extra">'+ex+'</div>':'')+'</div>';}).join('');}
-
 function switchView(v){currentView=v;document.getElementById('view-lista').style.display=v==='lista'?'block':'none';document.getElementById('view-dash').style.display=v==='dash'?'block':'none';document.getElementById('tabLista').classList.toggle('active',v==='lista');document.getElementById('tabDash').classList.toggle('active',v==='dash');document.getElementById('navLista').classList.toggle('active',v==='lista');document.getElementById('navDash').classList.toggle('active',v==='dash');if(v==='dash')renderDashboard();}
 function renderDashboard(){var t=clientes.length;var a=clientes.filter(function(c){return normalizeOrigem(c.origem)==='Astra';});var j=clientes.filter(function(c){return normalizeOrigem(c.origem)==='Japi';});var s6=clientes.filter(function(c){var d=diasDesde(ultimaVisita(c));return d===null||d>60;});var nv=clientes.filter(function(c){return!ultimaVisita(c);});var v30=clientes.filter(function(c){return c.visitas&&c.visitas.some(function(v){return diasDesde(v)!==null&&diasDesde(v)<=30;});});var ov=clientes.slice().sort(function(a,b){var da=diasDesde(ultimaVisita(a));var db=diasDesde(ultimaVisita(b));if(da===null&&db===null)return 0;if(da===null)return-1;if(db===null)return 1;return db-da;}).slice(0,15);var kc=[{key:'total',num:t,color:'',label:'Total de clientes',html:function(){return lh(clientes,'Nenhum cliente.');}},{key:'astra',num:a.length,color:'var(--red)',label:'Clientes Astra',html:function(){return lh(a,'Nenhum cliente Astra.');}},{key:'japi',num:j.length,color:'var(--accent)',label:'Clientes Japi',html:function(){return lh(j,'Nenhum cliente Japi.');}},{key:'sem60',num:s6.length,color:'var(--red)',label:'Sem visita +60d',html:function(){return lh(s6,'Nenhum.');}},{key:'nunca',num:nv.length,color:'var(--amber)',label:'Nunca visitados',html:function(){return lh(nv,'Todos visitados.');}},{key:'visitas30',num:v30.length,color:'var(--green)',label:'Visitas 30d',html:function(){return lh(v30,'Nenhuma.');}}];var w=document.getElementById('view-dash');w.innerHTML='<div class="dash-wrap"><div class="kpi-grid">'+kc.map(function(k){return '<div class="kpi-card '+(dashKpiOpen===k.key?'open':'')+'" onclick="toggleKpi(\''+k.key+'\')"><div class="kpi-num" style="'+(k.color?'color:'+k.color:'')+'">'+k.num+'</div><div class="kpi-label">'+k.label+'</div></div>';}).join('')+'</div>'+(dashKpiOpen?'<div class="dash-card"><div class="dash-card-title">'+kc.find(function(k){return k.key===dashKpiOpen;}).label+'</div><div class="expand-list">'+kc.find(function(k){return k.key===dashKpiOpen;}).html()+'</div></div>':'')+'<div class="dash-card"><div class="dash-card-title">🔴 Ordem de necessidade de visita</div>'+(ov.length?ov.map(function(c){var i=urgenciaInfo(c);var co=i.dias===null?'var(--red)':(i.dias>60?'var(--red)':'var(--amber)');return '<div class="attn-row" onclick="openEditDrawer(\''+c.id+'\')"><div class="attn-name">'+c.nome+'</div><div class="attn-days" style="color:'+co+'">'+(i.dias===null?'Nunca':i.dias+'d')+'</div></div>';}).join(''):'<div style="color:var(--muted);font-size:13px">Nenhum cliente.</div>')+'</div></div>';}
 function toggleKpi(key){dashKpiOpen=dashKpiOpen===key?null:key;renderDashboard();}
 function lh(lista,vazio){if(!lista.length)return '<div class="expand-list-empty">'+vazio+'</div>';return lista.map(function(c){return '<div class="attn-row" onclick="event.stopPropagation();openEditDrawer(\''+c.id+'\')"><div class="attn-name">'+c.nome+'</div><div class="attn-days" style="color:var(--muted);font-weight:500">'+normalizeOrigem(c.origem)+'</div></div>';}).join('');}
-
 function openNewDrawer(){['n-nome','n-cnpj','n-contato','n-endereco','n-telefone','n-email','n-ultima','n-obs'].forEach(function(id){document.getElementById(id).value='';});newOrigem='Astra';document.querySelectorAll('#n-origem-grid .origin-pill').forEach(function(p){p.className='origin-pill';});document.querySelector('#n-origem-grid .origin-pill').className='origin-pill sel-Astra';document.getElementById('overlay').classList.add('show');document.getElementById('newDrawer').classList.add('open');}
 function selectOrigem(o,el){newOrigem=o;document.querySelectorAll('#n-origem-grid .origin-pill').forEach(function(p){p.className='origin-pill';});el.className='origin-pill sel-'+o;}
-
 function openEditDrawer(id){editingId=id;var c=clientes.find(function(x){return x.id===id;});if(!c)return;var co=normalizeOrigem(c.origem);var vo=(c.visitas||[]).slice().map(function(v){return cleanDate(v);}).filter(function(v){return v;}).sort().reverse();document.getElementById('editBody').innerHTML='<div class="field"><label>Nome do cliente</label><input type="text" id="e-nome" value="'+(c.nome||'').replace(/"/g,'&quot;')+'"></div><div class="field"><label>CNPJ</label><input type="text" id="e-cnpj" value="'+(c.cnpj||'')+'"></div><div class="field"><label>Origem</label><select id="e-origem"><option value="Astra" '+(co==='Astra'?'selected':'')+'>Astra</option><option value="Japi" '+(co==='Japi'?'selected':'')+'>Japi</option></select></div><div class="field"><label>Contato / referência</label><input type="text" id="e-contato" value="'+(c.contato||'').replace(/"/g,'&quot;')+'"></div><div class="field"><label>Endereço</label><input type="text" id="e-endereco" value="'+(c.endereco||'').replace(/"/g,'&quot;')+'"></div><div class="field"><label>Telefone</label><input type="text" id="e-telefone" value="'+(c.telefone||'')+'"></div><div class="field"><label>E-mail</label><input type="email" id="e-email" value="'+(c.email||'')+'"></div><div class="field"><label>Última compra</label><input type="date" id="e-ultima" value="'+(cleanDate(c.ultimaCompra)||'')+'"></div><div class="field"><label>Observações</label><textarea id="e-obs">'+(c.observacoes||'')+'</textarea></div><div class="field"><label>Visitas realizadas ('+vo.length+')</label><div class="visit-list">'+(vo.length?vo.map(function(v){return '<div class="visit-item"><span>'+fmtDate(v)+'</span><button onclick="removerVisita(\''+v+'\')">Remover</button></div>';}).join(''):'<div style="color:var(--muted);font-size:13px">Nenhuma visita registrada.</div>')+'</div><div class="add-visit-row"><input type="date" id="e-nova-visita"><button class="btn-ghost" onclick="addVisita()">+ Visita</button></div><button class="btn-today" onclick="addVisitaHoje()">Registrar visita hoje</button></div><div class="field"><label>📅 Agendar no Google Agenda</label><div class="add-visit-row"><input type="date" id="e-data-agenda" value="'+tomorrowISO()+'"><button class="btn-ghost" onclick="agendarGoogleCalendar()">Agendar</button></div></div><button class="btn-primary" onclick="salvarEdicao()">Salvar alterações</button><button class="btn-danger" onclick="excluirCliente()">Excluir cliente</button>';document.getElementById('overlay').classList.add('show');document.getElementById('editDrawer').classList.add('open');}
 function closeAllDrawers(){document.getElementById('overlay').classList.remove('show');document.querySelectorAll('.drawer').forEach(function(d){d.classList.remove('open');});editingId=null;}
-
 function salvarNovo(){var n=document.getElementById('n-nome').value.trim();if(!n){showToast('Informe o nome do cliente');return;}clientes.push({id:'c-'+Date.now()+'-'+Math.floor(Math.random()*10000),nome:n,cnpj:document.getElementById('n-cnpj').value.trim(),contato:document.getElementById('n-contato').value.trim(),endereco:document.getElementById('n-endereco').value.trim(),telefone:document.getElementById('n-telefone').value.trim(),email:document.getElementById('n-email').value.trim(),ultimaCompra:document.getElementById('n-ultima').value||null,observacoes:document.getElementById('n-obs').value.trim(),visitas:[],origem:newOrigem});saveClientes();pushToCloud();closeAllDrawers();renderLista();renderUrgChips();showToast('Cliente cadastrado');}
 function salvarEdicao(){var c=clientes.find(function(x){return x.id===editingId;});if(!c)return;c.nome=document.getElementById('e-nome').value.trim()||c.nome;c.cnpj=document.getElementById('e-cnpj').value.trim();c.origem=document.getElementById('e-origem').value;c.contato=document.getElementById('e-contato').value.trim();c.endereco=document.getElementById('e-endereco').value.trim();c.telefone=document.getElementById('e-telefone').value.trim();c.email=document.getElementById('e-email').value.trim();c.ultimaCompra=document.getElementById('e-ultima').value||null;c.observacoes=document.getElementById('e-obs').value.trim();saveClientes();pushToCloud();closeAllDrawers();renderLista();renderUrgChips();if(currentView==='dash')renderDashboard();showToast('Cliente atualizado');}
 function excluirCliente(){if(!confirm('Excluir este cliente permanentemente?'))return;clientes=clientes.filter(function(x){return x.id!==editingId;});saveClientes();pushToCloud();closeAllDrawers();renderLista();renderUrgChips();if(currentView==='dash')renderDashboard();showToast('Cliente excluído');}
 function addVisita(){var d=document.getElementById('e-nova-visita').value;if(!d){showToast('Selecione uma data');return;}var c=clientes.find(function(x){return x.id===editingId;});if(!c)return;if(!c.visitas)c.visitas=[];if(c.visitas.some(function(v){return cleanDate(v)===d;})){showToast('Visita já registrada');return;}c.visitas.push(d);saveClientes();pushToCloud();openEditDrawer(editingId);showToast('Visita adicionada');}
 function addVisitaHoje(){var c=clientes.find(function(x){return x.id===editingId;});if(!c)return;var h=todayISO();if(!c.visitas)c.visitas=[];if(c.visitas.some(function(v){return cleanDate(v)===h;})){showToast('Visita de hoje já registrada');return;}c.visitas.push(h);saveClientes();pushToCloud();openEditDrawer(editingId);showToast('Visita de hoje registrada');}
 function removerVisita(d){var c=clientes.find(function(x){return x.id===editingId;});if(!c)return;c.visitas=(c.visitas||[]).filter(function(v){return cleanDate(v)!==d;});saveClientes();pushToCloud();openEditDrawer(editingId);showToast('Visita removida');}
-
 function agendarGoogleCalendar(){var c=clientes.find(function(x){return x.id===editingId;});if(!c)return;var data=document.getElementById('e-data-agenda').value;if(!data){showToast('Selecione uma data');return;}var d=data.replace(/-/g,'');var start=d+'T090000';var end=d+'T100000';var desc='Cliente: '+c.nome+'\n';if(c.contato)desc+='Contato: '+c.contato+'\n';if(c.endereco)desc+='Endereço: '+c.endereco+'\n';if(c.telefone)desc+='Telefone: '+c.telefone+'\n';if(c.email)desc+='E-mail: '+c.email+'\n';if(c.observacoes)desc+='Obs: '+c.observacoes+'\n';desc+='\nOrigem: '+normalizeOrigem(c.origem);var url='https://calendar.google.com/calendar/render?action=TEMPLATE';url+='&text='+encodeURIComponent('Visita: '+c.nome);url+='&dates='+start+'/'+end;url+='&details='+encodeURIComponent(desc);url+='&location='+encodeURIComponent(c.endereco||'');window.open(url,'_blank');showToast('Abrindo seu Google Agenda...');}
-
 function handleSyncClick(){if(!navigator.onLine){showToast('Sem conexão');return;}syncWithSheet();}
 async function syncWithSheet(){if(syncing)return;syncing=true;var lb=document.getElementById('loadingBar');if(lb)lb.classList.add('show');var lbl=document.getElementById('syncLabel');if(lbl)lbl.textContent='Sincronizando...';try{var url=APPS_SCRIPT_URL+'?t='+Date.now();var resp=await fetch(url,{redirect:'follow'});var txt=await resp.text();var remoto;try{remoto=JSON.parse(txt);}catch(e){remoto=[];}if(Array.isArray(remoto)&&remoto.length>0){clientes=remoto.map(function(c){var v=Array.isArray(c.visitas)?c.visitas.map(function(x){return cleanDate(x);}).filter(function(x){return x;}):[];return{id:c.id||('c-'+Math.random().toString(36).substr(2,9)),nome:c.nome||'',cnpj:c.cnpj||'',contato:c.contato||'',endereco:c.endereco||'',telefone:c.telefone||'',email:c.email||'',ultimaCompra:cleanDate(c.ultimaCompra),observacoes:c.observacoes||'',origem:normalizeOrigem(c.origem),visitas:v};});syncDone=true;saveClientes();renderLista();renderUrgChips();if(currentView==='dash')renderDashboard();showToast(clientes.length+' clientes carregados ✅');}else if(clientes.length>0){await pushToCloud();showToast('Dados enviados');}else{showToast('Planilha vazia');}}catch(e){showToast('Erro: '+e.message.substring(0,60));}if(lbl)lbl.textContent='Sincronizar';if(lb)lb.classList.remove('show');syncing=false;}
 async function pushToCloud(){if(!APPS_SCRIPT_URL)return;try{await fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(clientes)});}catch(e){}}
-
 function exportExcel(){var l=clientes.map(function(c){var uv=ultimaVisita(c);var i=urgenciaInfo(c);return{'CNPJ':c.cnpj||'','Nome Cliente':c.nome,'Origem':normalizeOrigem(c.origem),'Contato':c.contato||'','Endereço':c.endereco||'','Telefone':c.telefone||'','E-mail':c.email||'','Última Compra':fmtDate(c.ultimaCompra),'Última Visita':uv?fmtDate(uv):'Nunca visitado','Dias sem Visita':i.dias===null?'Nunca visitado':i.dias,'Observações':c.observacoes||'','Histórico de Visitas':(c.visitas||[]).slice().sort().map(fmtDate).join(', ')};});var ws=XLSX.utils.json_to_sheet(l);ws['!cols']=[{wch:18},{wch:38},{wch:9},{wch:34},{wch:30},{wch:16},{wch:28},{wch:14},{wch:14},{wch:14},{wch:40},{wch:50}];var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Clientes');XLSX.writeFile(wb,'clientes_visitas_'+todayISO()+'.xlsx');showToast('Planilha exportada 📥');}
-
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(function(){t.classList.remove('show');},3000);}
 window.addEventListener('online',function(){document.getElementById('offlineBar').classList.remove('show');});
 window.addEventListener('offline',function(){document.getElementById('offlineBar').classList.add('show');});
-
 loadClientes();renderUrgChips();renderLista();
 if(navigator.onLine)syncWithSheet();
 </script>
