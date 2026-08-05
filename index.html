@@ -108,3 +108,156 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 .visit-list{display:flex;flex-direction:column;gap:8px}
 .visit-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border-radius:var(--radius-sm);padding:12px 14px;font-size:14px;transition:background .2s}
+.visit-item:hover{background:var(--gray-light)}
+.visit-item button{border:none;background:none;color:var(--red);font-size:13px;cursor:pointer;padding:4px 8px;font-weight:600}
+.add-visit-row{display:flex;gap:10px}
+.add-visit-row input{flex:1;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:16px;background:var(--bg);outline:none}
+
+.btn-ghost{background:var(--accent-light);color:var(--accent);border:none;padding:13px 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s}
+.btn-ghost:hover{background:var(--accent);color:#fff}
+.btn-today{background:var(--green-light);color:var(--green);border:none;padding:14px 16px;border-radius:var(--radius-sm);font-size:15px;font-weight:700;cursor:pointer;width:100%;transition:all .2s}
+.btn-today:hover{background:var(--green);color:#fff}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;border:none;padding:16px;border-radius:var(--radius-sm);font-size:16px;font-weight:700;cursor:pointer;width:100%;letter-spacing:.3px;transition:all .2s;box-shadow:0 4px 12px rgba(0,124,194,0.3)}
+.btn-primary:hover{box-shadow:0 6px 20px rgba(0,124,194,0.4);transform:translateY(-1px)}
+.btn-primary:active{transform:scale(0.97)}
+.btn-danger{background:none;color:var(--red);border:1.5px solid var(--red-light);padding:14px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;width:100%;transition:all .2s}
+.btn-danger:hover{background:var(--red-light)}
+
+.dash-wrap{padding:0 18px 24px}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.kpi-card{background:var(--surface);border-radius:var(--radius);padding:20px 16px;box-shadow:var(--shadow);border:1px solid var(--border);cursor:pointer;transition:all .2s;text-align:center;position:relative;overflow:hidden}
+.kpi-card:active{transform:scale(0.97)}
+.kpi-card.open{border-color:var(--accent);border-width:2px;box-shadow:0 0 0 4px rgba(0,124,194,0.08)}
+.kpi-num{font-size:28px;font-weight:800;color:var(--accent)}
+.kpi-label{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.dash-card{background:var(--surface);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:14px}
+.dash-card-title{font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:14px}
+.expand-list{margin-top:6px}
+.expand-list-empty{font-size:13px;color:var(--muted);padding:6px 2px}
+.attn-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px;cursor:pointer;transition:padding .2s}
+.attn-row:hover{padding-left:6px}
+.attn-row:last-child{border-bottom:none}
+.attn-name{flex:1;padding-right:10px;min-width:0;word-break:break-word}
+.attn-days{font-weight:700;font-size:13px;flex-shrink:0}
+
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A2332;color:#fff;padding:13px 24px;border-radius:30px;font-size:14px;z-index:300;opacity:0;transition:all .3s;pointer-events:none;text-align:center;max-width:88%;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.cfg-body p{font-size:14px;line-height:1.7;color:var(--text);margin-bottom:12px}
+.cfg-body code{background:var(--gray-light);padding:3px 8px;border-radius:6px;font-size:13px}
+.cfg-body a{color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <div class="brand">
+      <div class="brand-logo"><img src="logo.png" alt="Astra" onerror="this.style.display='none'"></div>
+      <div><div class="brand-title">Controle de Visitas</div><div class="brand-sub">Astra &amp; Japi</div></div>
+    </div>
+    <div class="header-actions">
+      <button class="sync-btn" onclick="exportExcel()">📥 Excel</button>
+      <button class="sync-btn" onclick="handleSyncClick()">⇅ <span id="syncLabel">Sincronizar</span></button>
+    </div>
+  </div>
+  <div class="loading-bar" id="loadingBar">⏳ Carregando dados da planilha...</div>
+  <div class="offline-bar" id="offlineBar">📡 Sem conexão — alterações salvas localmente</div>
+</div>
+
+<div class="search-wrap">
+  <span class="search-icon">🔍</span>
+  <input class="search-input" id="searchInput" placeholder="Buscar cliente..." oninput="renderLista()">
+</div>
+<div class="chip-row" id="urgChips"></div>
+<div class="select-row">
+  <select id="filterOrigem" onchange="renderLista()">
+    <option value="Todos">Todas as origens</option>
+    <option value="Astra">Astra</option>
+    <option value="Japi">Japi</option>
+  </select>
+  <select id="sortBy" onchange="renderLista()">
+    <option value="urgencia">Mais tempo sem visita</option>
+    <option value="nome">Nome (A-Z)</option>
+    <option value="compra">Última compra</option>
+  </select>
+</div>
+
+<div class="tabs">
+  <button class="tab active" id="tabLista" onclick="switchView('lista')">📋 Lista</button>
+  <button class="tab" id="tabDash" onclick="switchView('dash')">📊 Dashboard</button>
+</div>
+
+<div id="view-lista"><div id="clientList"></div></div>
+<div id="view-dash" style="display:none"></div>
+
+<div class="overlay" id="overlay" onclick="closeAllDrawers()"></div>
+
+<div class="drawer" id="newDrawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <div class="drawer-header-left"><img src="logo.png" alt="Astra" class="drawer-header-logo" onerror="this.style.display='none'"><span class="drawer-title">Novo Cliente</span></div>
+    <button class="close-btn" onclick="closeAllDrawers()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="field"><label>Nome do cliente *</label><input type="text" id="n-nome" placeholder="Nome ou razão social"></div>
+    <div class="field"><label>CNPJ</label><input type="text" id="n-cnpj" placeholder="00.000.000/0000-00"></div>
+    <div class="field"><label>Contato / referência</label><input type="text" id="n-contato" placeholder="Pessoa de contato"></div>
+    <div class="field"><label>Endereço</label><input type="text" id="n-endereco" placeholder="Rua, número, bairro"></div>
+    <div class="field"><label>Telefone</label><input type="text" id="n-telefone" placeholder="(00) 00000-0000"></div>
+    <div class="field"><label>E-mail</label><input type="email" id="n-email" placeholder="email@exemplo.com"></div>
+    <div class="field"><label>Última compra</label><input type="date" id="n-ultima"></div>
+    <div class="field"><label>Origem</label><div class="origin-grid" id="n-origem-grid"><div class="origin-pill sel-Astra" onclick="selectOrigem('Astra',this)">Astra</div><div class="origin-pill" onclick="selectOrigem('Japi',this)">Japi</div></div></div>
+    <div class="field"><label>Observações</label><textarea id="n-obs" placeholder="Anotações sobre o cliente"></textarea></div>
+    <button class="btn-primary" onclick="salvarNovo()">Salvar cliente</button>
+  </div>
+</div>
+
+<div class="drawer" id="editDrawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <div class="drawer-header-left"><img src="logo.png" alt="Astra" class="drawer-header-logo" onerror="this.style.display='none'"><span class="drawer-title">Editar Cliente</span></div>
+    <button class="close-btn" onclick="closeAllDrawers()">✕</button>
+  </div>
+  <div class="drawer-body" id="editBody"></div>
+</div>
+
+<div class="drawer" id="cfgDrawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <div class="drawer-header-left"><img src="logo.png" alt="Astra" class="drawer-header-logo" onerror="this.style.display='none'"><span class="drawer-title">⚙️ Sincronização</span></div>
+    <button class="close-btn" onclick="closeAllDrawers()">✕</button>
+  </div>
+  <div class="drawer-body cfg-body">
+    <p>Os dados são salvos localmente e sincronizados com o Google Sheets.</p>
+    <button class="btn-ghost" onclick="exportExcel()">📥 Exportar Excel</button>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-btn active" id="navLista" onclick="switchView('lista')"><span class="nav-icon">📋</span> Lista</button>
+  <button class="nav-btn" id="navDash" onclick="switchView('dash')"><span class="nav-icon">📊</span> Dashboard</button>
+  <button class="nav-btn" onclick="openNewDrawer()"><span class="nav-icon">➕</span> Novo</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9dNP0V3nFAdMs-8qiCwa-dfAr-GWKFCfSxYEHlehp5v6oNJESzTyIUkgUG9BbBdeu/exec';
+
+let clientes = [];
+let editingId = null;
+let newOrigem = 'Astra';
+let currentView = 'lista';
+let chipFilter = 'all';
+let syncing = false;
+let dashKpiOpen = null;
+let syncDone = false;
+
+function cleanDate(d) {
+  if (!d) return null;
+  d = d.toString().trim();
+  if (d.indexOf('T') !== -1) d = d.split('T')[0];
+  if (d.length >= 10 && d.indexOf('-') === 4) return d.substring(0, 10);
+  var match = d.match(/^(\w{3})\s+(\w{3})\s+(\d{2})\s+(\d{4})/);
+  if
