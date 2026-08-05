@@ -241,7 +241,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="toast" id="toast"></div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLmRWS2ROSPxvTFfcFKQSpy8u0Q7LpkMzSJvzVqPjrCJ1D2kPiJ8w5fFIzNCV04rM9/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9dNP0V3nFAdMs-8qiCwa-dfAr-GWKFCfSxYEHlehp5v6oNJESzTyIUkgUG9BbBdeu/exec';
 
 let clientes = [];
 let editingId = null;
@@ -256,21 +256,35 @@ function cleanDate(d) {
   d = d.toString().trim();
   if (d.indexOf('T') !== -1) d = d.split('T')[0];
   if (d.length >= 10 && d.indexOf('-') === 4) return d.substring(0, 10);
+  var match = d.match(/^(\w{3})\s+(\w{3})\s+(\d{2})\s+(\d{4})/);
+  if (match) {
+    var meses = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var mi = meses.indexOf(match[2]);
+    if (mi >= 0) {
+      var mm = (mi + 1).toString();
+      if (mm.length < 2) mm = '0' + mm;
+      return match[4] + '-' + mm + '-' + match[3];
+    }
+  }
   return null;
 }
+
 function todayISO() { return new Date().toISOString().split('T')[0]; }
+
 function diasDesde(d) {
   if (!d) return null;
   d = cleanDate(d); if (!d) return null;
   var t = new Date(d + 'T00:00:00'); if (isNaN(t.getTime())) return null;
   return Math.floor((Date.now() - t.getTime()) / 86400000);
 }
+
 function fmtDate(d) {
   if (!d) return '—';
   d = cleanDate(d); if (!d) return '—';
-  var p = d.split('-'); if (p.length &lt; 3) return '—';
+  var p = d.split('-'); if (p.length < 3) return '—';
   return p[2] + '/' + p[1] + '/' + p[0];
 }
+
 function ultimaVisita(c) {
   if (c.visitas && c.visitas.length) {
     var limpas = c.visitas.map(function(v) { return cleanDate(v); }).filter(function(v) { return v; });
@@ -278,6 +292,7 @@ function ultimaVisita(c) {
   }
   return cleanDate(c.ultimaVisita) || null;
 }
+
 function urgenciaInfo(c) {
   var uv = ultimaVisita(c);
   if (!uv) return { dias: null, cor: 'red', label: 'Nunca visitado' };
@@ -286,6 +301,14 @@ function urgenciaInfo(c) {
   if (dias > 60) return { dias: dias, cor: 'red', label: dias + ' dias sem visita' };
   if (dias > 30) return { dias: dias, cor: 'amber', label: dias + ' dias sem visita' };
   return { dias: dias, cor: 'green', label: dias + ' dias sem visita' };
+}
+
+function normalizeOrigem(o) {
+  if (!o) return 'Astra';
+  var v = o.toString().toUpperCase().trim();
+  if (v === 'AS' || v === 'ASTRA') return 'Astra';
+  if (v === 'JAPI') return 'Japi';
+  return 'Astra';
 }
 
 function loadClientes() {
@@ -314,7 +337,8 @@ function renderLista() {
   var lista = clientes.filter(function(c) {
     var cnome = (c.nome||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
     if (!cnome.includes(q)) return false;
-    if (origem !== 'Todos' && c.origem !== origem) return false;
+    var cOrigem = normalizeOrigem(c.origem);
+    if (origem !== 'Todos' && cOrigem !== origem) return false;
     if (chipFilter === 'all') return true;
     var info = urgenciaInfo(c);
     if (chipFilter === 'red') return info.cor === 'red';
@@ -330,7 +354,8 @@ function renderLista() {
   if (lista.length === 0) { wrap.innerHTML = '<div class="empty-state"><div>🔍</div>Nenhum cliente encontrado</div>'; return; }
   wrap.innerHTML = lista.map(function(c) {
     var info = urgenciaInfo(c);
-    var badgeClass = 'badge-' + (c.origem || 'Astra');
+    var cOrigem = normalizeOrigem(c.origem);
+    var badgeClass = 'badge-' + cOrigem;
     var corLabel = info.cor === 'red' ? 'var(--red)' : (info.cor === 'amber' ? 'var(--amber)' : 'var(--green)');
     var urgClass = 'urg-' + info.cor;
     var extras = '';
@@ -341,7 +366,7 @@ function renderLista() {
     if (c.observacoes) extras += '<div>📝 ' + c.observacoes + '</div>';
     return '<div class="card ' + urgClass + '" onclick="openEditDrawer(\'' + c.id + '\')">' +
       '<div class="card-top"><div class="card-name">' + (c.nome||'') + '</div>' +
-      '<span class="badge ' + badgeClass + '">' + (c.origem||'Astra') + '</span></div>' +
+      '<span class="badge ' + badgeClass + '">' + cOrigem + '</span></div>' +
       '<div class="card-meta"><span style="color:' + corLabel + ';font-weight:700">' + info.label + '</span>' +
       '<span>·</span><span>Última compra: ' + fmtDate(c.ultimaCompra) + '</span></div>' +
       (extras ? '<div class="card-extra">' + extras + '</div>' : '') +
@@ -362,11 +387,11 @@ function switchView(v) {
 
 function renderDashboard() {
   var total = clientes.length;
-  var astra = clientes.filter(function(c) { return c.origem === 'Astra'; });
-  var japi = clientes.filter(function(c) { return c.origem === 'Japi'; });
+  var astra = clientes.filter(function(c) { return normalizeOrigem(c.origem) === 'Astra'; });
+  var japi = clientes.filter(function(c) { return normalizeOrigem(c.origem) === 'Japi'; });
   var listaSem60 = clientes.filter(function(c) { var d = diasDesde(ultimaVisita(c)); return d === null || d > 60; });
   var listaNunca = clientes.filter(function(c) { return !ultimaVisita(c); });
-  var listaVisitas30 = clientes.filter(function(c) { return c.visitas && c.visitas.some(function(v) { return diasDesde(v) !== null && diasDesde(v) &lt;= 30; }); });
+  var listaVisitas30 = clientes.filter(function(c) { return c.visitas && c.visitas.some(function(v) { return diasDesde(v) !== null && diasDesde(v) <= 30; }); });
   var ordemVisita = clientes.slice().sort(function(a,b) { var da = diasDesde(ultimaVisita(a)); var db = diasDesde(ultimaVisita(b)); if (da === null && db === null) return 0; if (da === null) return -1; if (db === null) return 1; return db - da; }).slice(0, 15);
   var kpiConfigs = [
     { key:'total', num:total, color:'', label:'Total de clientes', html:function(){return listaClientesHtml(clientes,'Nenhum cliente.');} },
@@ -384,7 +409,7 @@ function renderDashboard() {
   '</div>';
 }
 function toggleKpi(key) { dashKpiOpen = dashKpiOpen === key ? null : key; renderDashboard(); }
-function listaClientesHtml(lista, vazio) { if (!lista.length) return '<div class="expand-list-empty">' + vazio + '</div>'; return lista.map(function(c) { return '<div class="attn-row" onclick="event.stopPropagation();openEditDrawer(\'' + c.id + '\')"><div class="attn-name">' + c.nome + '</div><div class="attn-days" style="color:var(--muted);font-weight:500">' + (c.origem||'Astra') + '</div></div>'; }).join(''); }
+function listaClientesHtml(lista, vazio) { if (!lista.length) return '<div class="expand-list-empty">' + vazio + '</div>'; return lista.map(function(c) { return '<div class="attn-row" onclick="event.stopPropagation();openEditDrawer(\'' + c.id + '\')"><div class="attn-name">' + c.nome + '</div><div class="attn-days" style="color:var(--muted);font-weight:500">' + normalizeOrigem(c.origem) + '</div></div>'; }).join(''); }
 
 function openNewDrawer() {
   ['n-nome','n-cnpj','n-contato','n-endereco','n-telefone','n-email','n-ultima','n-obs'].forEach(function(id) { document.getElementById(id).value = ''; });
@@ -400,11 +425,12 @@ function openEditDrawer(id) {
   editingId = id;
   var c = clientes.find(function(x) { return x.id === id; });
   if (!c) return;
+  var cOrigem = normalizeOrigem(c.origem);
   var visitasOrdenadas = (c.visitas || []).slice().map(function(v) { return cleanDate(v); }).filter(function(v) { return v; }).sort().reverse();
   document.getElementById('editBody').innerHTML =
     '<div class="field"><label>Nome do cliente</label><input type="text" id="e-nome" value="' + (c.nome||'').replace(/"/g,'&quot;') + '"></div>' +
     '<div class="field"><label>CNPJ</label><input type="text" id="e-cnpj" value="' + (c.cnpj||'') + '"></div>' +
-    '<div class="field"><label>Origem</label><select id="e-origem"><option value="Astra" ' + (c.origem==='Astra'?'selected':'') + '>Astra</option><option value="Japi" ' + (c.origem==='Japi'?'selected':'') + '>Japi</option></select></div>' +
+    '<div class="field"><label>Origem</label><select id="e-origem"><option value="Astra" ' + (cOrigem==='Astra'?'selected':'') + '>Astra</option><option value="Japi" ' + (cOrigem==='Japi'?'selected':'') + '>Japi</option></select></div>' +
     '<div class="field"><label>Contato / referência</label><input type="text" id="e-contato" value="' + (c.contato||'').replace(/"/g,'&quot;') + '"></div>' +
     '<div class="field"><label>Endereço</label><input type="text" id="e-endereco" value="' + (c.endereco||'').replace(/"/g,'&quot;') + '"></div>' +
     '<div class="field"><label>Telefone</label><input type="text" id="e-telefone" value="' + (c.telefone||'') + '"></div>' +
@@ -448,7 +474,7 @@ async function syncWithSheet() {
     if (Array.isArray(remoto) && remoto.length > 0) {
       clientes = remoto.map(function(c) {
         var v = Array.isArray(c.visitas) ? c.visitas.map(function(x) { return cleanDate(x); }).filter(function(x) { return x; }) : [];
-        return { id:c.id||('c-'+Math.random().toString(36).substr(2,9)), nome:c.nome||'', cnpj:c.cnpj||'', contato:c.contato||'', endereco:c.endereco||'', telefone:c.telefone||'', email:c.email||'', ultimaCompra:cleanDate(c.ultimaCompra), observacoes:c.observacoes||'', origem:c.origem||'Astra', visitas:v };
+        return { id:c.id||('c-'+Math.random().toString(36).substr(2,9)), nome:c.nome||'', cnpj:c.cnpj||'', contato:c.contato||'', endereco:c.endereco||'', telefone:c.telefone||'', email:c.email||'', ultimaCompra:cleanDate(c.ultimaCompra), observacoes:c.observacoes||'', origem:normalizeOrigem(c.origem), visitas:v };
       });
       saveClientes(); renderLista(); renderUrgChips(); if (currentView === 'dash') renderDashboard();
       showToast('Sincronizado: ' + clientes.length + ' clientes ✅');
@@ -460,31 +486,11 @@ async function syncWithSheet() {
 async function pushToCloud() { if (!APPS_SCRIPT_URL) return; try { await fetch(APPS_SCRIPT_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(clientes) }); } catch (e) {} }
 
 function exportExcel() {
-  var linhas = clientes.map(function(c) { var uv = ultimaVisita(c); var info = urgenciaInfo(c); return { 'CNPJ':c.cnpj||'', 'Nome Cliente':c.nome, 'Origem':c.origem||'Astra', 'Contato':c.contato||'', 'Endereço':c.endereco||'', 'Telefone':c.telefone||'', 'E-mail':c.email||'', 'Última Compra':fmtDate(c.ultimaCompra), 'Última Visita':uv?fmtDate(uv):'Nunca visitado', 'Dias sem Visita':info.dias===null?'Nunca visitado':info.dias, 'Observações':c.observacoes||'', 'Histórico de Visitas':(c.visitas||[]).slice().sort().map(fmtDate).join(', ') }; });
+  var linhas = clientes.map(function(c) { var uv = ultimaVisita(c); var info = urgenciaInfo(c); return { 'CNPJ':c.cnpj||'', 'Nome Cliente':c.nome, 'Origem':normalizeOrigem(c.origem), 'Contato':c.contato||'', 'Endereço':c.endereco||'', 'Telefone':c.telefone||'', 'E-mail':c.email||'', 'Última Compra':fmtDate(c.ultimaCompra), 'Última Visita':uv?fmtDate(uv):'Nunca visitado', 'Dias sem Visita':info.dias===null?'Nunca visitado':info.dias, 'Observações':c.observacoes||'', 'Histórico de Visitas':(c.visitas||[]).slice().sort().map(fmtDate).join(', ') }; });
   var ws = XLSX.utils.json_to_sheet(linhas); ws['!cols'] = [{wch:18},{wch:38},{wch:9},{wch:34},{wch:30},{wch:16},{wch:28},{wch:14},{wch:14},{wch:14},{wch:40},{wch:50}];
   var wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Clientes'); XLSX.writeFile(wb, 'clientes_visitas_' + todayISO() + '.xlsx'); showToast('Planilha exportada 📥');
 }
 
 function showToast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._timer); t._timer = setTimeout(function() { t.classList.remove('show'); }, 2500); }
 function updateOfflineBar() { var el = document.getElementById('offlineBar'); if (navigator.onLine) el.classList.remove('show'); else el.classList.add('show'); }
-window.addEventListener('online', updateOfflineBar); window.addEventListener('offline', updateOfflineBar);
-
-loadClientes(); renderUrgChips(); renderLista(); updateOfflineBar();
-
-if (APPS_SCRIPT_URL && navigator.onLine) {
-  (async function() {
-    try {
-      var resp = await fetch(APPS_SCRIPT_URL); var remoto = await resp.json();
-      if (Array.isArray(remoto) && remoto.length > 0) {
-        clientes = remoto.map(function(c) {
-          var v = Array.isArray(c.visitas) ? c.visitas.map(function(x) { return cleanDate(x); }).filter(function(x) { return x; }) : [];
-          return { id:c.id||('c-'+Math.random().toString(36).substr(2,9)), nome:c.nome||'', cnpj:c.cnpj||'', contato:c.contato||'', endereco:c.endereco||'', telefone:c.telefone||'', email:c.email||'', ultimaCompra:cleanDate(c.ultimaCompra), observacoes:c.observacoes||'', origem:c.origem||'Astra', visitas:v };
-        });
-        saveClientes(); renderLista(); renderUrgChips(); showToast(clientes.length + ' clientes carregados');
-      }
-    } catch(e) {}
-  })();
-}
-</script>
-</body>
-</html>
+window.addEventListener('online', updateOfflineBar);
